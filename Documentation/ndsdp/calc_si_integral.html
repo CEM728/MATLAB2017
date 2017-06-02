@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of calc_si_integral</title>
+  <meta name="keywords" content="calc_si_integral">
+  <meta name="description" content="Written by Amit Hochman.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">ndsdp</a> &gt; calc_si_integral.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ndsdp&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>calc_si_integral
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Written by Amit Hochman.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [integral, oMasks, oSdpTh, oSdpDn, oBcD, oBcU, oSc, oIm, oPole] = calc_si_integral(vX, vY, x_s, y_s, k0, Er_d, Er_u, points, sComp, isMSource, qsRule) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Written by Amit Hochman.
+ Released under the Gnu Public License.
+ Last updated on: 6/25/2009.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="LS_space.html" class="code" title="function out = LS_space(x, y, x_s, y_s, k0, Er, sComp, isMagneticSrc)">LS_space</a>	</li><li><a href="calc_contours.html" class="code" title="function [oSdpTh, oSdpDn, oBcD, oBcU, oSc, oIm, oPole, oMasks] = calc_contours(vX, vY, x_s, y_s, k0, Er_d, Er_u, points, sComp, isMSource, qsRule)">calc_contours</a>	Written by Amit Hochman.</li><li><a href="calc_pole_ana.html" class="code" title="function out = calc_pole_ana(vGamma, t_pole, vSing)">calc_pole_ana</a>	</li><li><a href="calc_residue_vect.html" class="code" title="function res = calc_residue_vect(vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, oIm, oPole, bvDown, bv)">calc_residue_vect</a>	</li><li><a href="integrand_vect.html" class="code" title="function field = integrand_vect(oPath, vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, bMSource, oIm)">integrand_vect</a>	</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="ndsdp.html" class="code" title="function [field, nPoints] = ndsdp(EvalAt, Source, permittivityLowerRegion,permittivityUpperRegion, componentString, Options)">ndsdp</a>	[field, nPoints] = ndsdp(EvalAt, Source, permittivityLowerRegion, permittivityUpperRegion, componentString, Options)</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% Written by Amit Hochman.</span>
+0002 <span class="comment">% Released under the Gnu Public License.</span>
+0003 <span class="comment">% Last updated on: 6/25/2009.</span>
+0004 <a name="_sub0" href="#_subfunctions" class="code">function [integral, oMasks, oSdpTh, oSdpDn, oBcD, oBcU, oSc, oIm, oPole] = calc_si_integral(vX, vY, x_s, y_s, k0, Er_d, Er_u, points, sComp, isMSource, qsRule)</a>
+0005 nX = length(vX);
+0006 integral = zeros(nX, 1);
+0007 oMasks = [];
+0008 bNonZero = (~isMSource &amp; (strcmpi(sComp, <span class="string">'Ez'</span>) | strcmpi(sComp, <span class="string">'Hx'</span>) | strcmpi(sComp, <span class="string">'Hy'</span>))) |<span class="keyword">...</span>
+0009     (isMSource &amp; (strcmpi(sComp, <span class="string">'Hz'</span>) | strcmpi(sComp, <span class="string">'Ex'</span>) | strcmpi(sComp, <span class="string">'Ey'</span>)));
+0010 <span class="keyword">if</span> bNonZero
+0011     [oSdpTh, oSdpDn, oBcD, oBcU, oSc, oIm, oPole, oMasks] = <a href="calc_contours.html" class="code" title="function [oSdpTh, oSdpDn, oBcD, oBcU, oSc, oIm, oPole, oMasks] = calc_contours(vX, vY, x_s, y_s, k0, Er_d, Er_u, points, sComp, isMSource, qsRule)">calc_contours</a>(vX, vY, x_s, y_s, k0, Er_d, Er_u, points, sComp, isMSource, qsRule);
+0012     i_sdp_th = integral;
+0013     i_sdp_dn = integral;
+0014     i_bc_u = integral;
+0015     i_bc_d = integral;
+0016     i_sc = integral;
+0017     <span class="keyword">if</span> ~isempty(oSdpTh)
+0018         E_sdp = <a href="integrand_vect.html" class="code" title="function field = integrand_vect(oPath, vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, bMSource, oIm)">integrand_vect</a>(oSdpTh, vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, isMSource, oIm);
+0019         i_sdp_th(oSdpTh.bv) = sum(E_sdp.*oSdpTh.jac,2);
+0020     <span class="keyword">end</span>
+0021     <span class="keyword">if</span> ~isempty(oSc)
+0022         E_sc = <a href="integrand_vect.html" class="code" title="function field = integrand_vect(oPath, vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, bMSource, oIm)">integrand_vect</a>(oSc, vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, isMSource, oIm);
+0023         i_sc(oSc.bv) = sum(E_sc.*oSc.jac,2);
+0024     <span class="keyword">end</span>
+0025     <span class="keyword">if</span> ~isempty(oSdpDn)
+0026         E_sdp = <a href="integrand_vect.html" class="code" title="function field = integrand_vect(oPath, vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, bMSource, oIm)">integrand_vect</a>(oSdpDn, vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, isMSource, oIm);
+0027         i_sdp_dn(oSdpDn.bv) = sum(E_sdp.*oSdpDn.jac,2);
+0028     <span class="keyword">end</span>
+0029     <span class="keyword">if</span> ~isempty(oBcD)
+0030         bv = oBcD{1}.bv;
+0031         nKx = size(oBcD{1}.kx,2);
+0032         mX = repmat(vX(bv), 1, nKx);
+0033         phase_x = exp(-j*abs(mX-x_s).*oBcD{1}.kx);
+0034         E_bcR = <a href="integrand_vect.html" class="code" title="function field = integrand_vect(oPath, vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, bMSource, oIm)">integrand_vect</a>(oBcD{2}, vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, isMSource, oIm)./phase_x;
+0035         E_bcL = <a href="integrand_vect.html" class="code" title="function field = integrand_vect(oPath, vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, bMSource, oIm)">integrand_vect</a>(oBcD{1}, vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, isMSource, oIm)./phase_x;
+0036         E_bcD = (E_bcR-E_bcL).*phase_x;
+0037 
+0038         <span class="comment">% handle leaky pole in Mag. source</span>
+0039         bDown = 1;
+0040         bvActive = oPole.vActive_d &amp; bv;
+0041         <span class="keyword">if</span> any(bvActive)
+0042             bvActiveInBv = bvActive(bv);
+0043             vRes = <a href="calc_residue_vect.html" class="code" title="function res = calc_residue_vect(vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, oIm, oPole, bvDown, bv)">calc_residue_vect</a>(vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, oIm, oPole, bDown, bvActive);
+0044             vGamma = oPole.vGamma_d(bvActive);
+0045             vStep = oPole.vStep_d(bvActive);
+0046             vSing = oPole.vSing_d(bvActive);
+0047             mGamma = repmat(vGamma, 1, nKx);
+0048             mStep = repmat(vStep, 1, nKx);
+0049             mRes = repmat(vRes, 1, nKx);
+0050             mSing = repmat(vSing, 1, nKx);
+0051             k_plsmin = k0*sqrt(Er_d);
+0052             k_pole = oPole.k_pole;
+0053             mT = real((oBcD{1}.kx(bvActiveInBv,:)/k_plsmin-1)./mStep);
+0054             mT_pole = (k_pole./k_plsmin-1)./mStep;
+0055             E_pole = (mRes./(mT-mT_pole).*(mT).^mSing).*exp(-mGamma.*mT);
+0056             E_bcD_regular = E_bcD(bvActiveInBv,:) - E_pole;
+0057             dKxdT = k_plsmin*vStep;
+0058             pole_ana = dKxdT.*vRes.*<a href="calc_pole_ana.html" class="code" title="function out = calc_pole_ana(vGamma, t_pole, vSing)">calc_pole_ana</a>(vGamma, mT_pole(:,1), vSing);
+0059             i_bc_d(bvActive) = sum(E_bcD_regular.*oBcD{1}.jac(bvActiveInBv,:),2) + pole_ana;
+0060         <span class="keyword">end</span>
+0061         <span class="keyword">if</span> any(~bvActive)
+0062             bvNotActiveInBv = ~bvActive(bv);
+0063             i_bc_d(bv &amp; ~bvActive) = sum(E_bcD(bvNotActiveInBv,:).*oBcD{1}.jac(bvNotActiveInBv,:),2);
+0064         <span class="keyword">end</span>
+0065     <span class="keyword">end</span>
+0066     <span class="keyword">if</span> ~isempty(oBcU)
+0067         bv = oBcU{1}.bv;
+0068         nKx = size(oBcU{1}.kx,2);
+0069         mX = repmat(vX(bv), 1, nKx);
+0070         phase_x = exp(-j*abs(mX-x_s).*oBcU{1}.kx);
+0071         E_bcR = <a href="integrand_vect.html" class="code" title="function field = integrand_vect(oPath, vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, bMSource, oIm)">integrand_vect</a>(oBcU{2}, vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, isMSource, oIm)./phase_x;
+0072         E_bcL = <a href="integrand_vect.html" class="code" title="function field = integrand_vect(oPath, vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, bMSource, oIm)">integrand_vect</a>(oBcU{1}, vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, isMSource, oIm)./phase_x;
+0073         E_bcU = (E_bcR-E_bcL).*phase_x;
+0074         <span class="comment">% handle leaky pole in Mag. source</span>
+0075         bDown = 0;
+0076         bvActive = oPole.vActive_u &amp; bv;
+0077         <span class="keyword">if</span> any(bvActive)
+0078             bvActiveInBv = bvActive(bv);
+0079             vRes = <a href="calc_residue_vect.html" class="code" title="function res = calc_residue_vect(vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, oIm, oPole, bvDown, bv)">calc_residue_vect</a>(vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, oIm, oPole, bDown, bvActive);
+0080             vGamma = oPole.vGamma_u(bvActive);
+0081             vStep = oPole.vStep_u(bvActive);
+0082             vSing = oPole.vSing_u(bvActive);
+0083             mGamma = repmat(vGamma, 1, nKx);
+0084             mStep = repmat(vStep, 1, nKx);
+0085             mRes = repmat(vRes, 1, nKx);
+0086             mSing = repmat(vSing, 1, nKx);
+0087 
+0088             k_plsmin = k0*sqrt(Er_u);
+0089             k_pole = oPole.k_pole;
+0090             mT = real((oBcU{1}.kx(bvActiveInBv,:)/k_plsmin-1)./mStep);
+0091             mT_pole = (k_pole./k_plsmin-1)./mStep;
+0092             E_pole = (mRes./(mT-mT_pole).*(mT).^mSing).*exp(-mGamma.*mT);
+0093             E_bcU_regular = E_bcU(bvActiveInBv,:) - E_pole;
+0094             dKxdT = k_plsmin*vStep;
+0095             pole_ana = dKxdT.*vRes.*<a href="calc_pole_ana.html" class="code" title="function out = calc_pole_ana(vGamma, t_pole, vSing)">calc_pole_ana</a>(vGamma, mT_pole(:,1), vSing);
+0096             i_bc_u(bvActive) = sum(E_bcU_regular.*oBcU{1}.jac(bvActiveInBv,:),2) + pole_ana;
+0097         <span class="keyword">end</span>
+0098         <span class="keyword">if</span> any(~bvActive)
+0099             bvNotActiveInBv = ~bvActive(bv);
+0100             i_bc_u(bv &amp; ~bvActive) = sum(E_bcU(bvNotActiveInBv,:).*oBcU{1}.jac(bvNotActiveInBv,:),2);
+0101         <span class="keyword">end</span>
+0102     <span class="keyword">end</span>
+0103     im = zeros(size(integral));
+0104     bvIm = oIm.Il ~= 0;
+0105     <span class="keyword">if</span> any(bvIm)
+0106         im(bvIm) = oIm.Il(bvIm).*<a href="LS_space.html" class="code" title="function out = LS_space(x, y, x_s, y_s, k0, Er, sComp, isMagneticSrc)">LS_space</a>(vX(bvIm), vY(bvIm), oIm.x_s(bvIm), oIm.y_s(bvIm), k0, oIm.Er(bvIm), sComp, isMSource);
+0107     <span class="keyword">end</span>
+0108     integral = i_sdp_th + i_sdp_dn + i_bc_u + i_bc_d + im + i_sc;
+0109 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 05-May-2015 18:03:31 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

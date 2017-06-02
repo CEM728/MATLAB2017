@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of ndsdp</title>
+  <meta name="keywords" content="ndsdp">
+  <meta name="description" content="[field, nPoints] = ndsdp(EvalAt, Source, permittivityLowerRegion, permittivityUpperRegion, componentString, Options)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">ndsdp</a> &gt; ndsdp.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ndsdp&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>ndsdp
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>[field, nPoints] = ndsdp(EvalAt, Source, permittivityLowerRegion, permittivityUpperRegion, componentString, Options)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [field, nPoints] = ndsdp(EvalAt, Source, permittivityLowerRegion,permittivityUpperRegion, componentString, Options) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> [field, nPoints] = ndsdp(EvalAt, Source, permittivityLowerRegion, permittivityUpperRegion, componentString, Options)
+ Calculate a Cartesian field component due to a line-source in the
+ presence of a dielectric half-space.
+
+ Inputs:
+ EvalAt.x, EvalAt.y - vectors or matrices of the coordinates at which the
+                      fields are evaluated.
+ Source.x, Source.y - source coordinates.
+ Source.polarizationString - 'TM' for an electric line-source, 'TE' for a
+                             magnetic one.
+ permittivityLowerRegion, - relative permittivities of the y&lt;0 and y&gt;0 regions.
+ permittivityUpperRegion
+ componentString - string specifying the component to be calculated.
+                   Allowed values are: 'Ex', 'Ey', 'Ez', 'Hx', 'Hy',
+                   'Hz', 'Dx', 'Dy', 'Dz'.
+ Options.quasistaticRule - string specifying the quadrature rule used for 
+                           the quasi-static case. Allowed values are: 
+                           'discretization' and 'Legendre' (default).
+                           'discretization' usually yields better accuracy
+                           but the generation of the rule may take longer.
+ Options.useAdaptive - if true, change the number of points adaptively. If
+                       false, use Options.nPoints for all observation points.
+ If options.useAdaptive == true, the following options must be set:
+ Options.tol - Maximum relative error for adaptive scheme.
+ Options.maxPoints - Max. number of integration points in the adaptive scheme.
+ If options.useAdaptive == false, the following option must be set:
+ Options.nPoints - number of integration points (should be even). 
+
+ Outputs: 
+ field - field component specified by componentString.
+ nPoints - number of integration points used. 
+ If Options.useAdaptive == true, the number of integration points used
+ for each observation point is return in nPoints, which is the same size
+ as EvalAt.x. If Options.useAdaptive == false, nPoints = Options.nPoints.
+ ------------------------------------------------------------------------
+ Written by Amit Hochman.
+ Released under the Gnu Public License.
+ Last updated on: 6/25/2009.
+ Set options</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="LS_space.html" class="code" title="function out = LS_space(x, y, x_s, y_s, k0, Er, sComp, isMagneticSrc)">LS_space</a>	</li><li><a href="adaptive_ndsdp.html" class="code" title="function [field, nPoints] = adaptive_ndsdp(EvalAt, Source, permittivityLowerRegion,permittivityUpperRegion, componentString, Options)">adaptive_ndsdp</a>	varargout = half_space_gf_tol(testing, sources, k0, oGd, varargin)</li><li><a href="calc_si_integral.html" class="code" title="function [integral, oMasks, oSdpTh, oSdpDn, oBcD, oBcU, oSc, oIm, oPole] = calc_si_integral(vX, vY, x_s, y_s, k0, Er_d, Er_u, points, sComp, isMSource, qsRule)">calc_si_integral</a>	Written by Amit Hochman.</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="adaptive_ndsdp.html" class="code" title="function [field, nPoints] = adaptive_ndsdp(EvalAt, Source, permittivityLowerRegion,permittivityUpperRegion, componentString, Options)">adaptive_ndsdp</a>	varargout = half_space_gf_tol(testing, sources, k0, oGd, varargin)</li><li><a href="example.html" class="code" title="">example</a>	% Calculation of the field of a line-source in front of dielectric half-space.</li><li><a href="ndsdpGui.html" class="code" title="function varargout = ndsdpGui(varargin)">ndsdpGui</a>	NDSDPGUI M-file for ndsdpGui.fig</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% [field, nPoints] = ndsdp(EvalAt, Source, permittivityLowerRegion, permittivityUpperRegion, componentString, Options)</span>
+0002 <span class="comment">% Calculate a Cartesian field component due to a line-source in the</span>
+0003 <span class="comment">% presence of a dielectric half-space.</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% Inputs:</span>
+0006 <span class="comment">% EvalAt.x, EvalAt.y - vectors or matrices of the coordinates at which the</span>
+0007 <span class="comment">%                      fields are evaluated.</span>
+0008 <span class="comment">% Source.x, Source.y - source coordinates.</span>
+0009 <span class="comment">% Source.polarizationString - 'TM' for an electric line-source, 'TE' for a</span>
+0010 <span class="comment">%                             magnetic one.</span>
+0011 <span class="comment">% permittivityLowerRegion, - relative permittivities of the y&lt;0 and y&gt;0 regions.</span>
+0012 <span class="comment">% permittivityUpperRegion</span>
+0013 <span class="comment">% componentString - string specifying the component to be calculated.</span>
+0014 <span class="comment">%                   Allowed values are: 'Ex', 'Ey', 'Ez', 'Hx', 'Hy',</span>
+0015 <span class="comment">%                   'Hz', 'Dx', 'Dy', 'Dz'.</span>
+0016 <span class="comment">% Options.quasistaticRule - string specifying the quadrature rule used for</span>
+0017 <span class="comment">%                           the quasi-static case. Allowed values are:</span>
+0018 <span class="comment">%                           'discretization' and 'Legendre' (default).</span>
+0019 <span class="comment">%                           'discretization' usually yields better accuracy</span>
+0020 <span class="comment">%                           but the generation of the rule may take longer.</span>
+0021 <span class="comment">% Options.useAdaptive - if true, change the number of points adaptively. If</span>
+0022 <span class="comment">%                       false, use Options.nPoints for all observation points.</span>
+0023 <span class="comment">% If options.useAdaptive == true, the following options must be set:</span>
+0024 <span class="comment">% Options.tol - Maximum relative error for adaptive scheme.</span>
+0025 <span class="comment">% Options.maxPoints - Max. number of integration points in the adaptive scheme.</span>
+0026 <span class="comment">% If options.useAdaptive == false, the following option must be set:</span>
+0027 <span class="comment">% Options.nPoints - number of integration points (should be even).</span>
+0028 <span class="comment">%</span>
+0029 <span class="comment">% Outputs:</span>
+0030 <span class="comment">% field - field component specified by componentString.</span>
+0031 <span class="comment">% nPoints - number of integration points used.</span>
+0032 <span class="comment">% If Options.useAdaptive == true, the number of integration points used</span>
+0033 <span class="comment">% for each observation point is return in nPoints, which is the same size</span>
+0034 <span class="comment">% as EvalAt.x. If Options.useAdaptive == false, nPoints = Options.nPoints.</span>
+0035 <span class="comment">% ------------------------------------------------------------------------</span>
+0036 <span class="comment">% Written by Amit Hochman.</span>
+0037 <span class="comment">% Released under the Gnu Public License.</span>
+0038 <span class="comment">% Last updated on: 6/25/2009.</span>
+0039 <a name="_sub0" href="#_subfunctions" class="code">function [field, nPoints] = ndsdp(EvalAt, Source, permittivityLowerRegion, </a><span class="keyword">...</span>
+0040     permittivityUpperRegion, componentString, Options)
+0041 <span class="comment">% Set options</span>
+0042 <span class="keyword">if</span> ~isfield(Options, <span class="string">'quasistaticRule'</span>)
+0043     Options.quasistaticRule = <span class="string">'Legendre'</span>;
+0044 <span class="keyword">end</span>
+0045 <span class="keyword">if</span> Options.useAdaptive
+0046     [field, nPoints] = <a href="adaptive_ndsdp.html" class="code" title="function [field, nPoints] = adaptive_ndsdp(EvalAt, Source, permittivityLowerRegion,permittivityUpperRegion, componentString, Options)">adaptive_ndsdp</a>(EvalAt, Source, permittivityLowerRegion,<span class="keyword">...</span>
+0047         permittivityUpperRegion, componentString, Options);
+0048     <span class="keyword">return</span>
+0049 <span class="keyword">else</span>
+0050     nPoints = Options.nPoints;
+0051 <span class="keyword">end</span>
+0052 k0 = 2*pi/Source.lambda;
+0053 isMagneticSource = ~(lower(Source.polarizationString(2)) == <span class="string">'m'</span>);
+0054 <span class="comment">% Handle equal permittivities case:</span>
+0055 <span class="keyword">if</span> permittivityLowerRegion == permittivityUpperRegion
+0056     field = <a href="LS_space.html" class="code" title="function out = LS_space(x, y, x_s, y_s, k0, Er, sComp, isMagneticSrc)">LS_space</a>(EvalAt.x, EvalAt.y, Source.x, Source.y, k0, permittivityLowerRegion,<span class="keyword">...</span>
+0057         componentString, isMagneticSource);
+0058     nPoints = 1;
+0059     <span class="keyword">return</span>
+0060 <span class="keyword">end</span>
+0061 
+0062 <span class="keyword">if</span> lower(componentString(1)) == <span class="string">'d'</span>
+0063     componentString(1) = <span class="string">'E'</span>;
+0064     bD = 1;
+0065 <span class="keyword">else</span>
+0066     bD = 0;
+0067 <span class="keyword">end</span>
+0068 x = EvalAt.x(:);
+0069 y = EvalAt.y(:);
+0070 xSrc = Source.x;
+0071 ySrc = Source.y;
+0072 <span class="keyword">if</span> abs(ySrc/Source.lambda) &lt; 1e-5; <span class="comment">% source right on the boundary is not handled well.</span>
+0073     ySrc = 1e-5;
+0074 <span class="keyword">end</span>
+0075 EvalAtSwitched = EvalAt; <span class="comment">% if ySrc&gt;0 permittivites are switched, because code only handles ySrc&lt;0</span>
+0076 <span class="keyword">if</span> ySrc &gt; 0
+0077     permittivityLowerRegionSwitched = permittivityUpperRegion;
+0078     permittivityUpperRegionSwitched = permittivityLowerRegion;
+0079     ySrcSwitched = -ySrc;
+0080     xSwitched = x + 2*(xSrc - x);
+0081     ySwitched = -y;
+0082     <span class="keyword">if</span> (componentString(2) == <span class="string">'x'</span>) || (componentString(2) == <span class="string">'y'</span>)
+0083         sgn = -1;
+0084     <span class="keyword">else</span>
+0085         sgn = 1;
+0086     <span class="keyword">end</span>
+0087     EvalAtSwitched.y = -EvalAtSwitched.y;
+0088     EvalAtSwitched.x = EvalAt.x + 2*(xSrc - EvalAt.x);
+0089 <span class="keyword">else</span>
+0090     permittivityLowerRegionSwitched = permittivityLowerRegion;
+0091     permittivityUpperRegionSwitched = permittivityUpperRegion;
+0092     ySrcSwitched = ySrc;
+0093     xSwitched = x;
+0094     ySwitched = y;
+0095     sgn = 1;
+0096 <span class="keyword">end</span>
+0097 integral = <a href="calc_si_integral.html" class="code" title="function [integral, oMasks, oSdpTh, oSdpDn, oBcD, oBcU, oSc, oIm, oPole] = calc_si_integral(vX, vY, x_s, y_s, k0, Er_d, Er_u, points, sComp, isMSource, qsRule)">calc_si_integral</a>(xSwitched, ySwitched, xSrc, ySrcSwitched, k0,<span class="keyword">...</span>
+0098     permittivityLowerRegionSwitched, permittivityUpperRegionSwitched, Options.nPoints,<span class="keyword">...</span>
+0099     componentString, isMagneticSource, Options.quasistaticRule);
+0100 addIncident = (sign(EvalAtSwitched.y) == sign(ySrcSwitched)) |<span class="keyword">...</span>
+0101     (EvalAtSwitched.y==0); <span class="comment">% Incident, or direct, field needed for y&lt;0.</span>
+0102 <span class="keyword">if</span> any(addIncident)
+0103     incidentField = <a href="LS_space.html" class="code" title="function out = LS_space(x, y, x_s, y_s, k0, Er, sComp, isMagneticSrc)">LS_space</a>(EvalAtSwitched.x, EvalAtSwitched.y, xSrc, <span class="keyword">...</span>
+0104         ySrcSwitched, k0, permittivityLowerRegionSwitched, componentString, isMagneticSource);
+0105     incidentField = incidentField.*addIncident;
+0106 <span class="keyword">else</span>
+0107     incidentField = 0;
+0108 <span class="keyword">end</span>
+0109 field = sgn*(integral + incidentField(:));
+0110 [rows, cols] = size(EvalAt.x);
+0111 field = reshape(field, rows, cols);
+0112 <span class="keyword">if</span> bD
+0113     bUp = EvalAt.y &gt; 0;
+0114     field(bUp) = field(bUp)*permittivityUpperRegion;
+0115     field(~bUp) = field(~bUp)*permittivityLowerRegion;
+0116 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 05-May-2015 18:03:31 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

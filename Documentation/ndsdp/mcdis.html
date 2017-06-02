@@ -1,0 +1,205 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of mcdis</title>
+  <meta name="keywords" content="mcdis">
+  <meta name="description" content="MCDIS Multiple-component discretization procedure.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">ndsdp</a> &gt; mcdis.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ndsdp&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>mcdis
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>MCDIS Multiple-component discretization procedure.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [ab,Ncap,kount]=mcdis(N,eps0,quad,Nmax) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> MCDIS Multiple-component discretization procedure.
+
+    This routine performs a sequence of discretizations of the 
+    given weight function (or measure), each discretization being
+    followed by an application of the Stieltjes, or Lanczos, 
+    procedure to produce approximations to the desired recurrence
+    coefficients. The fineness of the discretization is 
+    characterized by a discretization parameter N. The support of
+    the continuous part of the weight function is decomposed into
+    a given number mc of subintervals (some or all of which may 
+    be identical). The routine then applies to each subinterval 
+    an N-point quadrature rule to discretize the weight function 
+    on that subinterval. The discrete part of the weight function
+    (if there is any) is added on to the discretized continuous 
+    weight function. The sequence of discretizations, if chosen
+    judiciously, leads to convergence of the recurrence
+    coefficients for the discretized measures to those of the
+    given measure. If convergence to within a prescribed accuracy
+    eps0 occurs before N reaches its maximum allowed value Nmax,
+    then the value of N that yields convergence is output as 
+    Ncap, and so is the number of iterations, kount. If there is 
+    no convergence, the routine displays the message &quot;Ncap
+    exceeds Nmax in mcdis&quot; prior to exiting.
+
+    The choice between the Stieltjes and the Lanczos procedure is
+    made by setting the parameter irout equal to 1 in the former,
+    and different from 1, in the latter case.
+        
+    The details of the discretization are to be specified prior 
+    to calling the procedure. They are embodied in the following 
+    global parameters:
+
+    mc     = the number of component intervals
+    mp     = the number of points in the discrete part of the 
+             measure (mp=0 if there is none)
+    iq     = a parameter to be set equal to 1, if the user
+             provides his or her own quadrature routine, and 
+             different from 1 otherwise
+    idelta = a parameter whose default value is 1, but is 
+             preferably set equal to 2, if iq=1 and the user
+             provides Gauss-type quadrature routines
+ 
+    The component intervals have to be specified (in the order 
+    left to right) by a global mcx2 array AB=[[a1 b1];[a2 b2];
+    ...;[amc bmc]],  where for infinite extreme intervals a1=-Inf
+    resp. bmc=Inf. The discrete spectrum (if mp&gt;0) is similarly
+    specified by a global mpx2 array DM=[[x1 y1];[x2 y2];...;
+    ;[xmp ymp]] containing the abscissae and jumps.
+
+    If the user provides his or her own quadrature routine 
+    &quot;quadown&quot;, the routine mcdis must be called with the input 
+    parameter &quot;quad&quot; replaced by &quot;@quadown&quot;, otherwise with
+    &quot;quad&quot; replaced by &quot;@quadgp&quot;, a general-purpose routine
+    provided in the package. The quadrature routine must have 
+    the form
+
+                             function xw=quad(N,i)
+
+    where N is the number of nodes and i identifies the interval
+    to which the routine is to be applied.
+
+    The routine mcdis also applies to measures given originally 
+    in multi-component form.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="fejer.html" class="code" title="function uv=fejer(N)">fejer</a>	FEJER  Fejer quadrature rule.</li><li><a href="lanczos.html" class="code" title="function ab=lanczos(N,xw)">lanczos</a>	LANCZOS Lanczos algorithm.</li><li><a href="stieltjes.html" class="code" title="function ab=stieltjes(N,xw)">stieltjes</a>	STIELTJES Discretized Stieltjes procedure.</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="r_general.html" class="code" title="function ab=r_general(N, maxM, eps0, mcIn, minX, maxX, f, bInf)">r_general</a>	</li><li><a href="r_hrhermite.html" class="code" title="function ab=r_hrhermite(N,Mmax,eps0, beta)">r_hrhermite</a>	R_HRHERMITE  Half-range Hermite measure.</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% MCDIS Multiple-component discretization procedure.</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">%    This routine performs a sequence of discretizations of the</span>
+0004 <span class="comment">%    given weight function (or measure), each discretization being</span>
+0005 <span class="comment">%    followed by an application of the Stieltjes, or Lanczos,</span>
+0006 <span class="comment">%    procedure to produce approximations to the desired recurrence</span>
+0007 <span class="comment">%    coefficients. The fineness of the discretization is</span>
+0008 <span class="comment">%    characterized by a discretization parameter N. The support of</span>
+0009 <span class="comment">%    the continuous part of the weight function is decomposed into</span>
+0010 <span class="comment">%    a given number mc of subintervals (some or all of which may</span>
+0011 <span class="comment">%    be identical). The routine then applies to each subinterval</span>
+0012 <span class="comment">%    an N-point quadrature rule to discretize the weight function</span>
+0013 <span class="comment">%    on that subinterval. The discrete part of the weight function</span>
+0014 <span class="comment">%    (if there is any) is added on to the discretized continuous</span>
+0015 <span class="comment">%    weight function. The sequence of discretizations, if chosen</span>
+0016 <span class="comment">%    judiciously, leads to convergence of the recurrence</span>
+0017 <span class="comment">%    coefficients for the discretized measures to those of the</span>
+0018 <span class="comment">%    given measure. If convergence to within a prescribed accuracy</span>
+0019 <span class="comment">%    eps0 occurs before N reaches its maximum allowed value Nmax,</span>
+0020 <span class="comment">%    then the value of N that yields convergence is output as</span>
+0021 <span class="comment">%    Ncap, and so is the number of iterations, kount. If there is</span>
+0022 <span class="comment">%    no convergence, the routine displays the message &quot;Ncap</span>
+0023 <span class="comment">%    exceeds Nmax in mcdis&quot; prior to exiting.</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">%    The choice between the Stieltjes and the Lanczos procedure is</span>
+0026 <span class="comment">%    made by setting the parameter irout equal to 1 in the former,</span>
+0027 <span class="comment">%    and different from 1, in the latter case.</span>
+0028 <span class="comment">%</span>
+0029 <span class="comment">%    The details of the discretization are to be specified prior</span>
+0030 <span class="comment">%    to calling the procedure. They are embodied in the following</span>
+0031 <span class="comment">%    global parameters:</span>
+0032 <span class="comment">%</span>
+0033 <span class="comment">%    mc     = the number of component intervals</span>
+0034 <span class="comment">%    mp     = the number of points in the discrete part of the</span>
+0035 <span class="comment">%             measure (mp=0 if there is none)</span>
+0036 <span class="comment">%    iq     = a parameter to be set equal to 1, if the user</span>
+0037 <span class="comment">%             provides his or her own quadrature routine, and</span>
+0038 <span class="comment">%             different from 1 otherwise</span>
+0039 <span class="comment">%    idelta = a parameter whose default value is 1, but is</span>
+0040 <span class="comment">%             preferably set equal to 2, if iq=1 and the user</span>
+0041 <span class="comment">%             provides Gauss-type quadrature routines</span>
+0042 <span class="comment">%</span>
+0043 <span class="comment">%    The component intervals have to be specified (in the order</span>
+0044 <span class="comment">%    left to right) by a global mcx2 array AB=[[a1 b1];[a2 b2];</span>
+0045 <span class="comment">%    ...;[amc bmc]],  where for infinite extreme intervals a1=-Inf</span>
+0046 <span class="comment">%    resp. bmc=Inf. The discrete spectrum (if mp&gt;0) is similarly</span>
+0047 <span class="comment">%    specified by a global mpx2 array DM=[[x1 y1];[x2 y2];...;</span>
+0048 <span class="comment">%    ;[xmp ymp]] containing the abscissae and jumps.</span>
+0049 <span class="comment">%</span>
+0050 <span class="comment">%    If the user provides his or her own quadrature routine</span>
+0051 <span class="comment">%    &quot;quadown&quot;, the routine mcdis must be called with the input</span>
+0052 <span class="comment">%    parameter &quot;quad&quot; replaced by &quot;@quadown&quot;, otherwise with</span>
+0053 <span class="comment">%    &quot;quad&quot; replaced by &quot;@quadgp&quot;, a general-purpose routine</span>
+0054 <span class="comment">%    provided in the package. The quadrature routine must have</span>
+0055 <span class="comment">%    the form</span>
+0056 <span class="comment">%</span>
+0057 <span class="comment">%                             function xw=quad(N,i)</span>
+0058 <span class="comment">%</span>
+0059 <span class="comment">%    where N is the number of nodes and i identifies the interval</span>
+0060 <span class="comment">%    to which the routine is to be applied.</span>
+0061 <span class="comment">%</span>
+0062 <span class="comment">%    The routine mcdis also applies to measures given originally</span>
+0063 <span class="comment">%    in multi-component form.</span>
+0064 <span class="comment">%</span>
+0065 <a name="_sub0" href="#_subfunctions" class="code">function [ab,Ncap,kount]=mcdis(N,eps0,quad,Nmax)</a>
+0066 <span class="keyword">global</span> mc mp iq idelta irout DM uv AB
+0067 f=<span class="string">'Ncap exceeds Nmax in mcdis with irout=%2.0f\n'</span>;
+0068 <span class="keyword">if</span> N&lt;1, error(<span class="string">'Input variable N out of range'</span>), <span class="keyword">end</span>
+0069 iNcap=1; kount=-1;
+0070 ab(:,2)=zeros(N,1); b=ones(N,1);
+0071 Ncap=floor((2*N-1)/idelta);
+0072 <span class="keyword">while</span> any(abs(ab(:,2)-b)&gt;eps0*abs(ab(:,2)))
+0073   b=ab(:,2);
+0074   kount=kount+1;
+0075   <span class="keyword">if</span> kount&gt;1, iNcap=2^(floor(kount/5))*N; <span class="keyword">end</span>
+0076   Ncap=Ncap+iNcap;
+0077   <span class="keyword">if</span> Ncap&gt;Nmax 
+0078     fprintf(f,irout)
+0079     <span class="keyword">return</span>
+0080   <span class="keyword">end</span>
+0081   mtNcap=mc*Ncap;
+0082   <span class="keyword">if</span> iq~=1, uv=<a href="fejer.html" class="code" title="function uv=fejer(N)">fejer</a>(Ncap); <span class="keyword">end</span>
+0083   <span class="keyword">for</span> i=1:mc
+0084     im1tn=(i-1)*Ncap;
+0085     xw=feval(quad,Ncap,i);
+0086     xwm(im1tn+1:im1tn+Ncap,:)=xw;
+0087   <span class="keyword">end</span>
+0088   <span class="keyword">if</span> mp~=0, xwm(mtNcap+1:mtNcap+mp,:)=DM; <span class="keyword">end</span>
+0089   <span class="keyword">if</span> irout==1
+0090     ab=<a href="stieltjes.html" class="code" title="function ab=stieltjes(N,xw)">stieltjes</a>(N,xwm);
+0091   <span class="keyword">else</span>
+0092     ab=<a href="lanczos.html" class="code" title="function ab=lanczos(N,xw)">lanczos</a>(N,xwm);
+0093   <span class="keyword">end</span> 
+0094 <span class="keyword">end</span>
+0095 <span class="comment">% Ncap, kount</span>
+0096</pre></div>
+<hr><address>Generated on Tue 05-May-2015 18:03:31 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

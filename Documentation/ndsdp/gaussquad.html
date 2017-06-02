@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of gaussquad</title>
+  <meta name="keywords" content="gaussquad">
+  <meta name="description" content="GAUSSQUAD Gaussian quadrature integration.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">ndsdp</a> &gt; gaussquad.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ndsdp&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>gaussquad
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>GAUSSQUAD Gaussian quadrature integration.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [xx, ww] = gaussquad(n, a, b) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">GAUSSQUAD Gaussian quadrature integration.
+
+   [X, W] = GAUSSQUAD(N, A, B) returns the base points X and weight factors W
+   for integrating a function from A to B using an N-point Gaussian quadrature
+   rule.  This integral is exact for a polynomial of degree 2*N-1 or lower.
+
+   [X, W] = GAUSSQUAD(N, C) assumes the interval is from 0 to C.
+
+   [X, W] = GAUSSQUAD(N) assumes the interval is from -1 to 1.
+
+   GAUSSQUAD(...) with no output arguments plots the base points X and the
+   weight factors W.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="calc_contours.html" class="code" title="function [oSdpTh, oSdpDn, oBcD, oBcU, oSc, oIm, oPole, oMasks] = calc_contours(vX, vY, x_s, y_s, k0, Er_d, Er_u, points, sComp, isMSource, qsRule)">calc_contours</a>	Written by Amit Hochman.</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [xx, ww] = gaussquad(n, a, b)</a>
+0002 <span class="comment">%GAUSSQUAD Gaussian quadrature integration.</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%   [X, W] = GAUSSQUAD(N, A, B) returns the base points X and weight factors W</span>
+0005 <span class="comment">%   for integrating a function from A to B using an N-point Gaussian quadrature</span>
+0006 <span class="comment">%   rule.  This integral is exact for a polynomial of degree 2*N-1 or lower.</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%   [X, W] = GAUSSQUAD(N, C) assumes the interval is from 0 to C.</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%   [X, W] = GAUSSQUAD(N) assumes the interval is from -1 to 1.</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">%   GAUSSQUAD(...) with no output arguments plots the base points X and the</span>
+0013 <span class="comment">%   weight factors W.</span>
+0014 
+0015 <span class="comment">%   This program is based on an anonymous MATLAB program found on the MathWorks</span>
+0016 <span class="comment">%   FTP server, ftp://ftp.mathworks.com, extended and rewritten for speed.</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">%   According to the original program, concepts for finding the base points and</span>
+0019 <span class="comment">%   weight factors can be found on page 93 of &quot;Methods of Numerical</span>
+0020 <span class="comment">%   Integration&quot; by Philip Davis and Philip Rabinowitz.</span>
+0021 
+0022 <span class="comment">%   Author:      Peter J. Acklam</span>
+0023 <span class="comment">%   Time-stamp:  2004-02-02 08:36:19 +0100</span>
+0024 <span class="comment">%   E-mail:      pjacklam@online.no</span>
+0025 <span class="comment">%   URL:         http://home.online.no/~pjacklam</span>
+0026 
+0027    <span class="comment">% Check number of input arguments.</span>
+0028    error(nargchk(1, 3, nargin));
+0029 
+0030    <span class="comment">% Assign default values to missing arguments.</span>
+0031    <span class="keyword">switch</span> nargin
+0032       <span class="keyword">case</span> 1                    <span class="comment">% GAUSSQUAD(N)</span>
+0033          b = 1;
+0034          a = -1;
+0035       <span class="keyword">case</span> 2                    <span class="comment">% GAUSSQUAD(N, C)</span>
+0036          b = a;
+0037          a = 0;
+0038    <span class="keyword">end</span>
+0039 
+0040    u = 1 : n-1;
+0041    u = u ./ sqrt(4*u.^2 - 1);
+0042 
+0043    <span class="comment">% Same as A = diag(u, -1) + diag(u, 1), but faster (no addition).</span>
+0044    A = zeros(n, n);
+0045    A( 2 : n+1 : n*(n-1) ) = u;
+0046    A( n+1 : n+1 : n^2-1 ) = u;
+0047 
+0048    <span class="comment">% Find the base points X and weight factors W for the interval [-1,1].</span>
+0049    [v, x] = eig(A);
+0050    [x, k] = sort(diag(x));
+0051    w = 2 * v(1,k)'.^2;
+0052 
+0053    <span class="comment">% Linearly transform from [-1,1] to [a,b].</span>
+0054    x = (b - a) / 2 * x + (a + b) / 2;   <span class="comment">% transform base points X</span>
+0055    w = (b - a) / 2 * w;                 <span class="comment">% adjust weigths</span>
+0056 
+0057    <span class="comment">% If output arguments are given, return output and exit.</span>
+0058    <span class="keyword">if</span> nargout
+0059       xx = x(:);
+0060       ww = w(:);
+0061       <span class="keyword">return</span>
+0062    <span class="keyword">end</span>
+0063 
+0064    <span class="comment">% Plot base points and weight factors.</span>
+0065 
+0066    userdata = <span class="string">'Gaussian Quadrature Base Points and Weight Factors'</span>;
+0067    fig = findobj(0, <span class="string">'Type'</span>, <span class="string">'figure'</span>, <span class="string">'UserData'</span>, userdata);
+0068    <span class="keyword">if</span> isempty(fig)
+0069       fig = figure(<span class="string">'UserData'</span>, userdata);
+0070    <span class="keyword">end</span>
+0071    figure(fig);
+0072    h = plot(x, zeros(1, n), <span class="string">'.'</span>, x, w, <span class="string">'.'</span>);
+0073    set(h, <span class="string">'MarkerSize'</span>, 12);
+0074    set(gca, <span class="string">'XLim'</span>, [a b]);
+0075    title(sprintf(<span class="string">'Gaussian Quadrature with %d points'</span>, n));
+0076    xlabel(<span class="string">'Base points'</span>);
+0077    ylabel(<span class="string">'Weight factors'</span>);
+0078</pre></div>
+<hr><address>Generated on Tue 05-May-2015 18:03:31 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

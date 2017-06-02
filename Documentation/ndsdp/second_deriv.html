@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of second_deriv</title>
+  <meta name="keywords" content="second_deriv">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">ndsdp</a> &gt; second_deriv.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ndsdp&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>second_deriv
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function out = second_deriv(kx, b, c, kc_d, kc_u) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="calc_kc.html" class="code" title="function kc = calc_kc(k0, beta, Er, isImproper)">calc_kc</a>	kc = calc_kc(k0, beta, Er, isImproper)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="calc_contours.html" class="code" title="function [oSdpTh, oSdpDn, oBcD, oBcU, oSc, oIm, oPole, oMasks] = calc_contours(vX, vY, x_s, y_s, k0, Er_d, Er_u, points, sComp, isMSource, qsRule)">calc_contours</a>	Written by Amit Hochman.</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function out=calc_diff2(kc, isImp)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function out = second_deriv(kx, b, c, kc_d, kc_u)</a>
+0002 <span class="keyword">if</span> isempty(kx)
+0003     out = [];
+0004     <span class="keyword">return</span>
+0005 <span class="keyword">end</span>
+0006 bDenseIsDown = kc_d &gt; kc_u;
+0007 isImpDn = 1;
+0008 isImpTh = 0;
+0009 isImpD = bDenseIsDown*isImpDn + ~bDenseIsDown*isImpTh;
+0010 isImpU = ~bDenseIsDown*isImpDn + bDenseIsDown*isImpTh;
+0011 
+0012 
+0013 out = b.*<a href="#_sub1" class="code" title="subfunction out=calc_diff2(kc, isImp)">calc_diff2</a>(kc_u, isImpU) +  c.*<a href="#_sub1" class="code" title="subfunction out=calc_diff2(kc, isImp)">calc_diff2</a>(kc_d, isImpD);
+0014 
+0015 
+0016     <a name="_sub1" href="#_subfunctions" class="code">function out=calc_diff2(kc, isImp)</a>
+0017         bReal = abs(imag(kx)) &lt;= abs(real(kx))*eps;
+0018         kx(bReal) = kx(bReal)*(1+1j*eps);
+0019         [rows, cols] = size(kx);
+0020         isImp = repmat(isImp, rows, cols);
+0021         isImp(bReal) = 0;
+0022         out = -kc^2./(<a href="calc_kc.html" class="code" title="function kc = calc_kc(k0, beta, Er, isImproper)">calc_kc</a>(kc, kx, 1, isImp)).^3;
+0023     <span class="keyword">end</span>
+0024 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 05-May-2015 18:03:31 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

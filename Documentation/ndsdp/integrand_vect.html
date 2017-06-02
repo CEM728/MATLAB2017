@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of integrand_vect</title>
+  <meta name="keywords" content="integrand_vect">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">ndsdp</a> &gt; integrand_vect.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ndsdp&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>integrand_vect
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function field = integrand_vect(oPath, vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, bMSource, oIm) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="LS_kx.html" class="code" title="function out = LS_kx(kx, ky, x, y, x_s, y_s, k0, Er, sComp, bMsource)">LS_kx</a>	</li><li><a href="slowly_varying_no_beta.html" class="code" title="function field = slowly_varying_no_beta(oPath, vX, vY, x_s, k0, Er_d, Er_u, sComp, bMSource)">slowly_varying_no_beta</a>	</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="calc_residue_vect.html" class="code" title="function res = calc_residue_vect(vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, oIm, oPole, bvDown, bv)">calc_residue_vect</a>	</li><li><a href="calc_si_integral.html" class="code" title="function [integral, oMasks, oSdpTh, oSdpDn, oBcD, oBcU, oSc, oIm, oPole] = calc_si_integral(vX, vY, x_s, y_s, k0, Er_d, Er_u, points, sComp, isMSource, qsRule)">calc_si_integral</a>	Written by Amit Hochman.</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function field = integrand_vect(oPath, vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, bMSource, oIm)</a>
+0002 mKx = oPath.kx;
+0003 mKy_inc = oPath.ky_d;
+0004 mKy_t = oPath.ky_u;
+0005 bv = oPath.bv;
+0006 vX = vX(bv);
+0007 vY = vY(bv);
+0008 nXY = length(vX);
+0009 nKx = size(mKx, 2);
+0010 mX = repmat(vX, 1, nKx);
+0011 mY = repmat(vY, 1, nKx);
+0012 
+0013 bRef = vY&lt;=0;
+0014 mRef = repmat(bRef, 1, nKx);
+0015 mIl = repmat(oIm.Il(bv), 1, nKx);
+0016 mImEr = repmat(oIm.Er(bv), 1, nKx);
+0017 mImX_s = repmat(oIm.x_s(bv), 1, nKx);
+0018 mImY_s = repmat(oIm.y_s(bv), 1, nKx);
+0019 phase_r = zeros(nXY, nKx);
+0020 phase_t = phase_r;
+0021 field = phase_r;
+0022 im = phase_r;
+0023 
+0024 slow_amp = <a href="slowly_varying_no_beta.html" class="code" title="function field = slowly_varying_no_beta(oPath, vX, vY, x_s, k0, Er_d, Er_u, sComp, bMSource)">slowly_varying_no_beta</a>(oPath, vX, vY, x_s, k0, Er_d, Er_u, sComp, bMSource);
+0025 
+0026 phase_t(~mRef) = exp(-j*(mKx(~mRef).*abs(mX(~mRef)-x_s) + <span class="keyword">...</span>
+0027     mKy_t(~mRef).*abs(mY(~mRef)) + mKy_inc(~mRef)*abs(y_s)));
+0028 field(~mRef) = slow_amp(~mRef).*phase_t(~mRef);
+0029 
+0030 phase_r(mRef) = exp(-j*(mKx(mRef).*abs(mX(mRef)-x_s) + mKy_inc(mRef).*(abs(mY(mRef)) + abs(y_s))));
+0031 field(mRef) = slow_amp(mRef).*phase_r(mRef);
+0032 
+0033 <span class="comment">% subtract images</span>
+0034 bFix = (mIl ~= 0);
+0035 <span class="keyword">if</span> any(bFix)
+0036     ky = zeros(size(mKx(bFix)));
+0037     ky(bFix) = mKy_inc(bFix).*(mImEr(bFix) == Er_d) + mKy_t(bFix).*(mImEr(bFix) == Er_u);
+0038     im(bFix) = -mIl(bFix).*<a href="LS_kx.html" class="code" title="function out = LS_kx(kx, ky, x, y, x_s, y_s, k0, Er, sComp, bMsource)">LS_kx</a>(mKx(bFix), ky(bFix), mX(bFix), mY(bFix), mImX_s(bFix), mImY_s(bFix), k0, mImEr(bFix), sComp, bMSource);
+0039 <span class="keyword">end</span>
+0040 
+0041 field = field+im;</pre></div>
+<hr><address>Generated on Tue 05-May-2015 18:03:31 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

@@ -1,0 +1,895 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of calc_contours</title>
+  <meta name="keywords" content="calc_contours">
+  <meta name="description" content="Written by Amit Hochman.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">ndsdp</a> &gt; calc_contours.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ndsdp&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>calc_contours
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Written by Amit Hochman.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [oSdpTh, oSdpDn, oBcD, oBcU, oSc, oIm, oPole, oMasks] = calc_contours(vX, vY, x_s, y_s, k0, Er_d, Er_u, points, sComp, isMSource, qsRule) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Written by Amit Hochman.
+ Released under the Gnu Public License.
+ Last updated on: 6/25/2009.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="calc_kc.html" class="code" title="function kc = calc_kc(k0, beta, Er, isImproper)">calc_kc</a>	kc = calc_kc(k0, beta, Er, isImproper)</li><li><a href="gaussGen.html" class="code" title="function [x, w] = gaussGen(n, minX, maxX, f)">gaussGen</a>	</li><li><a href="gausshrhermite.html" class="code" title="function [x, w] = gausshrhermite(n, vSigma, beta)">gausshrhermite</a>	</li><li><a href="gausslag.html" class="code" title="function [x, w] = gausslag(n, alpha, beta)">gausslag</a>	Laguerre polynomial</li><li><a href="gaussquad.html" class="code" title="function [xx, ww] = gaussquad(n, a, b)">gaussquad</a>	GAUSSQUAD Gaussian quadrature integration.</li><li><a href="mlinspace.html" class="code" title="function y = mlinspace(d1, d2, n)">mlinspace</a>	MLINSPACE linspace for column vector arguments</li><li><a href="sdp.html" class="code" title="function s = sdp(x, y, x_s, y_s, kc_d, kc_u)">sdp</a>	</li><li><a href="second_deriv.html" class="code" title="function out = second_deriv(kx, b, c, kc_d, kc_u)">second_deriv</a>	</li><li><a href="slowly_varying_qs_vect.html" class="code" title="function field = slowly_varying_qs_vect(oPath, vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, bMSource)">slowly_varying_qs_vect</a>	This function is only used to generate the gaussian rule</li><li><a href="smooth_path_vect_LS.html" class="code" title="function [sm_path, jac] = smooth_path_vect_LS(x, y, t, xi, vMax, vX0)">smooth_path_vect_LS</a>	</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="calc_si_integral.html" class="code" title="function [integral, oMasks, oSdpTh, oSdpDn, oBcD, oBcU, oSc, oIm, oPole] = calc_si_integral(vX, vY, x_s, y_s, k0, Er_d, Er_u, points, sComp, isMSource, qsRule)">calc_si_integral</a>	Written by Amit Hochman.</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function add_bci(bv, bDense)</a></li><li><a href="#_sub2" class="code">function bvFix = add_sdp(bv, bDense)</a></li><li><a href="#_sub3" class="code">function mKx = grad_walk(kx0, g0, xi, isImpTh, isImpDn, bv)</a></li><li><a href="#_sub4" class="code">function dPh = phase_factor_diff(s, isImpTh, isImpDn, bv)</a></li><li><a href="#_sub5" class="code">function out = ky_diff(kc, kx, isImp)</a></li><li><a href="#_sub6" class="code">function isImp = calc_isImp(mKx, vIsImpR, vIsImpL, kc)</a></li><li><a href="#_sub7" class="code">function out = bc_crossed(kx1, kx2, kc)</a></li><li><a href="#_sub8" class="code">function add_qs</a></li><li><a href="#_sub9" class="code">function w = weight_fun(t, bR)</a></li><li><a href="#_sub10" class="code">function [vKx, vJac] = path(xi)</a></li><li><a href="#_sub11" class="code">function rule_and_path(bv, bR)</a></li><li><a href="#_sub12" class="code">function add_sc</a></li><li><a href="#_sub13" class="code">function oOut = squeeze_zeros(oPath)</a></li><li><a href="#_sub14" class="code">function out = makematR(vIn, n)</a></li><li><a href="#_sub15" class="code">function out = makematC(vIn, n)</a></li><li><a href="#_sub16" class="code">function alpha = calc_alpha(bDense, step)</a></li><li><a href="#_sub17" class="code">function oOut = add_points(oOut, bv, xi, jac, kx, ky_d, ky_u)</a></li><li><a href="#_sub18" class="code">function oSdpDn_constructor</a></li><li><a href="#_sub19" class="code">function oSc_constructor</a></li><li><a href="#_sub20" class="code">function oSdpTh_constructor</a></li><li><a href="#_sub21" class="code">function oBcD_constructor</a></li><li><a href="#_sub22" class="code">function oBcU_constructor</a></li><li><a href="#_sub23" class="code">function ph = phase_factor(s, isImpTh, isImpDn, bv)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% Written by Amit Hochman.</span>
+0002 <span class="comment">% Released under the Gnu Public License.</span>
+0003 <span class="comment">% Last updated on: 6/25/2009.</span>
+0004 
+0005 <a name="_sub0" href="#_subfunctions" class="code">function [oSdpTh, oSdpDn, oBcD, oBcU, oSc, oIm, oPole, oMasks] = calc_contours(vX, vY, x_s, y_s, k0, Er_d, Er_u, points, sComp, isMSource, qsRule)</a>
+0006 bc2sdpPoints = 0.50;
+0007 sc_factor = 2;
+0008 bc_points = points*bc2sdpPoints;
+0009 kc_d = sqrt(Er_d)*k0;
+0010 kc_u = sqrt(Er_u)*k0;
+0011 kc_th = min(kc_d, kc_u);
+0012 kc_dn = max(kc_d, kc_u);
+0013 delta_k = kc_dn-kc_th;
+0014 Er_dn = max(Er_d, Er_u);
+0015 Er_th = min(Er_d, Er_u);
+0016 vX = vX(:);
+0017 vY = vY(:);
+0018 nX = length(vX);
+0019 bDid = Er_d&gt;Er_u;
+0020 bvRef = vY&lt;=0;
+0021 bvTran = ~bvRef;
+0022 vA = abs(vX-x_s);
+0023 vB = bvTran.*vY;
+0024 vC = (abs(y_s)+bvRef.*abs(vY));
+0025 vR = hypot(vA, vB + vC);
+0026 bvXgrY = (vA &gt; vB + vC);
+0027 bvXggY = (vA(bvTran) &gt; 10*(vB(bvTran) + vC(bvTran))); <span class="comment">% sdp calculation doesn't work well when x&gt;&gt;y</span>
+0028 bvSmall_contrast = (delta_k*vA&lt;1.5);
+0029 
+0030 vB_r = vB(bvRef);
+0031 vB_t = vB(bvTran);
+0032 vC_r = vC(bvRef);
+0033 vC_t = vC(bvTran);
+0034 
+0035 oIm.Il = zeros(nX,1);
+0036 oIm.Er = zeros(nX,1);
+0037 oIm.bQs = zeros(nX,1);
+0038 oIm.y_s = zeros(nX,1);
+0039 oIm.x_s = repmat(x_s, nX, 1);
+0040 oSdpTh = [];
+0041 oSdpDn = [];
+0042 oBcD = [];
+0043 oBcU = [];
+0044 oSc = [];
+0045 
+0046 <span class="comment">% calc. asymptotic slopes</span>
+0047 vM1 = vA./(vB + vC);
+0048 bvSing = vB == vC;
+0049 vM2(bvSing) = inf;
+0050 vM2(~bvSing) = bvTran(~bvSing).*(vA(~bvSing)./(vC(~bvSing)-vB(~bvSing)).*<span class="keyword">...</span>
+0051     (2*bDid-1)) + bvRef(~bvSing).*vM1(~bvSing)*(2*bDid-1);
+0052 vM2 = vM2(:);
+0053 vM3 = -vM1;
+0054 vA2 = atan(vM2);
+0055 vA2 = vA2.*(vA2&gt;0) + (vA2+pi).*(vA2&lt;0);
+0056 <span class="comment">% calc. BCI angles</span>
+0057 vTheta_dn = (vA2+atan(vM3)-pi)/2;
+0058 vTheta_th = (atan(vM1)+vA2)/2+pi;
+0059 vStep_th = exp(1j*vTheta_th);
+0060 vStep_dn = exp(1j*vTheta_dn);
+0061 vStep_down = bDid*vStep_dn+~bDid*vStep_th;
+0062 vStep_up = ~bDid*vStep_dn+bDid*vStep_th;
+0063 
+0064 dense = true;
+0065 thin = false;
+0066 vAlpha_th = <a href="#_sub16" class="code" title="subfunction alpha = calc_alpha(bDense, step)">calc_alpha</a>(thin, vStep_th);
+0067 vAlpha_dn = <a href="#_sub16" class="code" title="subfunction alpha = calc_alpha(bDense, step)">calc_alpha</a>(dense, vStep_dn);
+0068 vAlpha_down = bDid*vAlpha_dn+~bDid*vAlpha_th;
+0069 vAlpha_up = ~bDid*vAlpha_dn+bDid*vAlpha_th;
+0070 
+0071 vAngleForSc = -max(abs(atan(vM3)),pi/4);
+0072 vStep_right_sdp = exp(1j*vAngleForSc);
+0073 vAlpha_sdp_right = -vA.*abs(imag(vStep_right_sdp)) - (vB+vC).*abs(real(vStep_right_sdp));
+0074 vAlpha_sdp = vAlpha_sdp_right;
+0075 
+0076 vPowD(bvTran) = 0;
+0077 vPowU(bvTran) = 0.5*(lower(sComp(2))==<span class="string">'x'</span>);
+0078 vPowU(bvRef) = 0;
+0079 vPowD(bvRef) = -0.5*((lower(sComp(2))==<span class="string">'y'</span>) || (lower(sComp(2))==<span class="string">'z'</span>));
+0080 
+0081 <span class="comment">% the difference integrand has a sqrt dependence.</span>
+0082 vPowD = vPowD + (vPowD==0)*0.5;
+0083 vPowU = vPowU + (vPowU==0)*0.5;
+0084 vPowD = vPowD(:);
+0085 vPowU = vPowU(:);
+0086 vPowDn = bDid*vPowD + ~bDid*vPowU;
+0087 vPowTh = ~bDid*vPowD + bDid*vPowU;
+0088 
+0089 <span class="comment">% High contrast, MLS =&gt; leaky pole</span>
+0090 k_pole = sqrt((Er_d*Er_u)/(Er_d+Er_u))*k0;
+0091 delta_k_pole = abs(k_pole-kc_th);
+0092 bvHigh_contrast_th = (delta_k_pole*vA&lt;1);
+0093 
+0094 mSdp = <a href="sdp.html" class="code" title="function s = sdp(x, y, x_s, y_s, kc_d, kc_u)">sdp</a>(vX, vY, x_s, y_s, kc_d, kc_u);
+0095 sdp_r = mSdp(bvRef,1);
+0096 sdp_th_t = mSdp(bvTran,1);
+0097 sdp_dn_t = mSdp(bvTran,2);
+0098 sigma_r = sqrt(1./abs((<a href="second_deriv.html" class="code" title="function out = second_deriv(kx, b, c, kc_d, kc_u)">second_deriv</a>(sdp_r, vB_r, vC_r, kc_d, kc_u))))*sqrt(2);
+0099 sigma_th_t = sqrt(1./abs((<a href="second_deriv.html" class="code" title="function out = second_deriv(kx, b, c, kc_d, kc_u)">second_deriv</a>(sdp_th_t, vB_t, vC_t, kc_d, kc_u))))*sqrt(2);
+0100 vAlpha2 = <a href="second_deriv.html" class="code" title="function out = second_deriv(kx, b, c, kc_d, kc_u)">second_deriv</a>(sdp_dn_t, vB_t, vC_t, kc_d, kc_u);
+0101 vGamma_CplxSp = pi/4*ones(nX,1);
+0102 vGamma_CplxSp(bvTran) = 1/2*angle(conj(1j*vAlpha2));
+0103 vGamma_CplxSp(vGamma_CplxSp&lt;0) = vGamma_CplxSp(vGamma_CplxSp&lt;0)+pi;
+0104 sigma_dn_t = sqrt(1./abs(vAlpha2))*sqrt(2);
+0105 
+0106 vSigma_th = zeros(nX, 1);
+0107 vSigma_dn = zeros(nX, 1);
+0108 vSigma_th(bvTran) = sigma_th_t;
+0109 vSigma_th(bvRef) = sigma_r;
+0110 vSigma_dn(bvTran) = sigma_dn_t;
+0111 vSigma_dn(bvRef) = sigma_r;
+0112 
+0113 bvQs = 2*kc_dn &lt; 2*pi./vR;
+0114 oIm.bQs = bvQs;
+0115 
+0116 vSdp_th = zeros(nX, 1);
+0117 vSdp_dn = zeros(nX, 1);
+0118 vSdp_th(bvTran) = sdp_th_t;
+0119 vSdp_th(bvRef) = sdp_r;
+0120 vSdp_dn(bvTran) = sdp_dn_t;
+0121 vSdp_dn(bvRef) = sdp_r;
+0122 
+0123 <span class="comment">% When SP near BP, the SDP is moved so that it passes right through the BP.</span>
+0124 <span class="comment">% The singularity is dealt with by an appropriate Gaussian rule.</span>
+0125 vFalse_all = false(nX, 1);
+0126 vFalse_t = false(sum(bvTran),1);
+0127 vFalse_r = false(sum(bvRef),1);
+0128 bvCritJump = vFalse_all;
+0129 sigmas_crit = 1;
+0130 <span class="keyword">if</span> any(bvRef)
+0131     bvCritJump_r = (abs(sdp_r-kc_th) &lt; sigma_r/sqrt(2)*sigmas_crit) &amp; ~bvQs(bvRef) &amp; bDid;
+0132     warning(<span class="string">'off'</span>, <span class="string">'MATLAB:divideByZero'</span>);
+0133     vSecondIntrsct = kc_d^2./sdp_r;
+0134     warning(<span class="string">'on'</span>, <span class="string">'MATLAB:divideByZero'</span>);
+0135     bvCritJump_r = bvCritJump_r &amp; (abs(vSecondIntrsct-kc_dn) &gt; (kc_dn-kc_th)/2 + abs(sdp_r-kc_th));
+0136     bvCritJump(bvRef) = bvCritJump_r;
+0137 <span class="keyword">end</span>
+0138 
+0139 <span class="comment">% Case B</span>
+0140 <span class="comment">% transmitted</span>
+0141 sigmas_caseB = 1;
+0142 <span class="keyword">if</span> any(bvTran)
+0143     bvCaseBTth = abs(vSdp_th(bvTran)-kc_th) &lt; vSigma_th(bvTran)/sqrt(2)*sigmas_caseB;
+0144     bvCaseBTdn = abs(vSdp_dn(bvTran)-kc_dn) &lt; vSigma_dn(bvTran)/sqrt(2)*sigmas_caseB;
+0145     bvCaseBTth = bvCaseBTth | bvXggY;
+0146     bvCaseBTdn = bvCaseBTdn | bvXggY;
+0147 <span class="keyword">end</span>
+0148 <span class="comment">% reflected</span>
+0149 <span class="keyword">if</span> any(bvRef)
+0150     bvCaseBR = abs(sdp_r-kc_d) &lt; sigma_r/sqrt(2)*sigmas_caseB;
+0151 <span class="keyword">end</span>
+0152 
+0153 <span class="comment">% calc. whether dense SP is intercepted (in Trans.)</span>
+0154 bvSpDnIntcp = vFalse_t;
+0155 oMasks.bvBpSpIntcp = vFalse_all;
+0156 <span class="keyword">if</span> any(bvTran)
+0157     isImpTh = 0;
+0158     isImpDn = 0;
+0159     s = vSdp_th(bvTran);
+0160     ph_at_spTh = <a href="#_sub23" class="code" title="subfunction ph = phase_factor(s, isImpTh, isImpDn, bv)">phase_factor</a>(s, isImpTh, isImpDn, bvTran);
+0161     isImpDn = 1;
+0162     s = vSdp_dn(bvTran);
+0163     ph_at_spDn = <a href="#_sub23" class="code" title="subfunction ph = phase_factor(s, isImpTh, isImpDn, bv)">phase_factor</a>(s, isImpTh, isImpDn, bvTran);
+0164     bvSpDnIntcp = real(ph_at_spTh) &lt; real(ph_at_spDn);
+0165     bvSpDnIntcp = bvSpDnIntcp | bvXggY;
+0166     oMasks.bvBpSpIntcp(bvTran) = bvSpDnIntcp;
+0167 <span class="keyword">end</span>
+0168 
+0169 <span class="comment">% calc. whether Up BP is intercepted (in Ref.)</span>
+0170 bvUpBpIntcp = vFalse_r;
+0171 <span class="keyword">if</span> any(bvRef)
+0172     bvUpBpIntcp = vA(bvRef)./sqrt(vA(bvRef).^2+vC(bvRef).^2)&gt;sqrt(Er_th/Er_dn);
+0173     oMasks.bvBpSpIntcp(bvRef) = bvUpBpIntcp;
+0174     bvUpBpIntcp = bvUpBpIntcp &amp; ~bvCritJump_r;
+0175 <span class="keyword">end</span>
+0176 
+0177 oPole.vStep_u = vStep_up;
+0178 oPole.vStep_d = vStep_down;
+0179 oPole.vGamma_u  = -vAlpha_up*kc_u;
+0180 oPole.vGamma_d  = -vAlpha_down*kc_d;
+0181 oPole.k_pole = k_pole;
+0182 oPole.vSing_d = vPowD;
+0183 oPole.vSing_u = vPowU;
+0184 <span class="comment">% Control Section --------------------------------</span>
+0185 <span class="comment">% Quasi-static</span>
+0186 <span class="keyword">if</span> any(bvQs)
+0187     <a href="#_sub8" class="code" title="subfunction add_qs">add_qs</a>;
+0188 <span class="keyword">end</span>
+0189 bvDone = bvQs;
+0190 bvSDPth = ~bvDone;
+0191 <span class="comment">% reflected</span>
+0192 <span class="keyword">if</span> any(bvRef)
+0193     bvBCIRu = ~bvDone &amp; bvRef;
+0194     bvBCIRu(bvRef) = bvBCIRu(bvRef) &amp; bvUpBpIntcp;
+0195     bvBCIRd = ~bvDone &amp; bvRef;
+0196     bvBCIRd(bvRef) = bvBCIRd(bvRef) &amp; bvUpBpIntcp &amp; bvCaseBR;
+0197     bvSDPth(bvRef) = bvSDPth(bvRef) &amp; (~bvUpBpIntcp | bvUpBpIntcp &amp; ~bvCaseBR);
+0198 <span class="keyword">end</span>
+0199 
+0200 <span class="comment">% transmitted</span>
+0201 <span class="keyword">if</span> any(bvTran)
+0202     bvSDPth(bvTran) = bvSDPth(bvTran) &amp; (~bvSpDnIntcp | bvSpDnIntcp &amp; ~bvCaseBTth);
+0203     bvSDPdn = ~bvDone &amp; bvTran;
+0204     bvSDPdn(bvTran) = bvSDPdn(bvTran) &amp; bvSpDnIntcp &amp; ~bvCaseBTdn;
+0205     bvBCIth = ~bvDone;
+0206     bvBCIth(bvTran) = bvBCIth(bvTran) &amp; bvSpDnIntcp  &amp; bvCaseBTth;
+0207     bvBCIdn = ~bvDone;
+0208     bvBCIdn(bvTran) = bvBCIdn(bvTran) &amp; bvSpDnIntcp  &amp; bvCaseBTdn;
+0209 <span class="keyword">end</span>
+0210 
+0211 <span class="keyword">if</span> any(bvRef)
+0212     <span class="keyword">if</span> bDid
+0213         bvBCIdn(bvRef) = bvBCIRd(bvRef);
+0214         bvBCIth(bvRef) = bvBCIRu(bvRef);
+0215     <span class="keyword">else</span>
+0216         bvBCIth(bvRef) = bvBCIRd(bvRef);
+0217         bvBCIdn(bvRef) = bvBCIRu(bvRef);
+0218     <span class="keyword">end</span>
+0219 <span class="keyword">end</span>
+0220 bvBCIdn = bvBCIdn(:);
+0221 bvBCIth = bvBCIth(:);
+0222 <span class="comment">% Small contrast</span>
+0223 bvSc = bvSmall_contrast &amp; ~bvQs;
+0224 <span class="keyword">if</span> any(bvTran)
+0225     bvSc(bvTran) = bvSc(bvTran) &amp; (bvBCIdn(bvTran) | bvCaseBTth); 
+0226 <span class="keyword">end</span>
+0227 <span class="keyword">if</span> any(bvRef)
+0228     bvScCrit = ((kc_dn-kc_th) &lt;sigma_r) &amp; (abs(sdp_r-kc_th) &lt; sigma_r/sqrt(2)*sigmas_crit);
+0229     bvSc(bvRef) = bvSc(bvRef) &amp; bvScCrit;
+0230 <span class="keyword">end</span>
+0231 
+0232 bvSDPth = bvSDPth &amp; ~bvSc;
+0233 <span class="keyword">if</span> any(bvTran)
+0234     bvSDPdn = bvSDPdn &amp; ~bvSc;
+0235 <span class="keyword">end</span>
+0236 bvBCIth = bvBCIth &amp; ~bvSc;
+0237 bvBCIdn = bvBCIdn &amp; ~bvSc;
+0238 <span class="keyword">if</span> any(bvSc)
+0239     <a href="#_sub12" class="code" title="subfunction add_sc">add_sc</a>;
+0240 <span class="keyword">end</span>
+0241 
+0242 <span class="comment">% masks</span>
+0243 <span class="keyword">if</span> any(bvRef)
+0244     oMasks.bvBCIRu = bvBCIRu;
+0245     oMasks.bvBCIRd = bvBCIRd;
+0246     oMasks.bvCritJump = bvCritJump;
+0247 <span class="keyword">end</span>
+0248 <span class="keyword">if</span> any(bvTran)
+0249     oMasks.bvSDPdn = bvSDPdn;
+0250 <span class="keyword">end</span>
+0251 oMasks.bvSDPth = bvSDPth;
+0252 oMasks.bvBCIth = bvBCIth;
+0253 oMasks.bvBCIdn = bvBCIdn;
+0254 oMasks.bvQs = bvQs;
+0255 oMasks.bvSc = bvSc;
+0256 
+0257 <span class="keyword">if</span> any(bvSDPth)
+0258     bvFix = <a href="#_sub2" class="code" title="subfunction bvFix = add_sdp(bv, bDense)">add_sdp</a>(bvSDPth, thin);
+0259 <span class="keyword">else</span>
+0260     bvFix = false;
+0261 <span class="keyword">end</span>
+0262 
+0263 <span class="comment">% fix possible error in dense bp interception due to inaccurate path.</span>
+0264 <span class="comment">% it is possible that the path will not intcp, when the exact path</span>
+0265 <span class="comment">% should intcp. This is detected by two conditions:</span>
+0266 <span class="comment">% 1. That the exact path intcps</span>
+0267 <span class="comment">% 2. That the path ended on the proper sheet.</span>
+0268 <span class="comment">% if bvFix, the path surrounding the Dense BP is unnecessary.</span>
+0269 <span class="keyword">if</span> any(bvTran)
+0270     <span class="keyword">if</span> any(bvSDPdn)
+0271         <span class="keyword">if</span> any(bvFix)
+0272             bvSDPdn = bvSDPdn &amp; ~bvFix;
+0273         <span class="keyword">end</span>
+0274         <span class="keyword">if</span> any(bvSDPdn)
+0275             <a href="#_sub2" class="code" title="subfunction bvFix = add_sdp(bv, bDense)">add_sdp</a>(bvSDPdn, dense);
+0276         <span class="keyword">end</span>
+0277     <span class="keyword">end</span>
+0278 <span class="keyword">end</span>
+0279 <span class="keyword">if</span> any(bvBCIdn)
+0280     <span class="keyword">if</span> any(bvFix)
+0281         bvBCIdn = bvBCIdn &amp; ~bvFix;
+0282     <span class="keyword">end</span>
+0283     <span class="keyword">if</span> any(bvBCIdn)
+0284         <a href="#_sub1" class="code" title="subfunction add_bci(bv, bDense)">add_bci</a>(bvBCIdn(:), dense);
+0285     <span class="keyword">end</span>
+0286 <span class="keyword">end</span>
+0287 <span class="keyword">if</span> any(bvBCIth)
+0288     <a href="#_sub1" class="code" title="subfunction add_bci(bv, bDense)">add_bci</a>(bvBCIth(:), thin);
+0289 <span class="keyword">end</span>
+0290 bvActive_dn = vFalse_all; 
+0291 bvCaseA = bDid &amp; bvBCIth &amp; bvRef &amp; ~(bvHigh_contrast_th &amp; isMSource);
+0292 bvActive_th = isMSource &amp; ~bvCaseA;
+0293 oPole.vActive_d = bDid &amp; bvActive_dn | ~bDid &amp; bvActive_th;
+0294 oPole.vActive_u = bDid &amp; bvActive_th | ~bDid &amp; bvActive_dn;
+0295 
+0296 
+0297 <span class="comment">% Clean-up -----------------------------------------------------------</span>
+0298 <span class="keyword">if</span> ~isempty(oBcD)
+0299     <span class="comment">% Squeeze out zeros</span>
+0300     <span class="comment">% We do not know which observation points will require bci's before the</span>
+0301     <span class="comment">% calculation has ended (depends on which RS we end up on)</span>
+0302     oBcD{1} = <a href="#_sub13" class="code" title="subfunction oOut = squeeze_zeros(oPath)">squeeze_zeros</a>(oBcD{1});
+0303     oBcD{2} = <a href="#_sub13" class="code" title="subfunction oOut = squeeze_zeros(oPath)">squeeze_zeros</a>(oBcD{2});
+0304 <span class="keyword">end</span>
+0305 <span class="keyword">if</span> ~isempty(oBcU)
+0306     oBcU{1} = <a href="#_sub13" class="code" title="subfunction oOut = squeeze_zeros(oPath)">squeeze_zeros</a>(oBcU{1});
+0307     oBcU{2} = <a href="#_sub13" class="code" title="subfunction oOut = squeeze_zeros(oPath)">squeeze_zeros</a>(oBcU{2});
+0308 <span class="keyword">end</span>
+0309 <span class="keyword">if</span> ~isempty(oSdpTh)
+0310     oSdpTh = <a href="#_sub13" class="code" title="subfunction oOut = squeeze_zeros(oPath)">squeeze_zeros</a>(oSdpTh);
+0311 <span class="keyword">end</span>
+0312 <span class="keyword">if</span> ~isempty(oSdpDn)
+0313     oSdpDn = <a href="#_sub13" class="code" title="subfunction oOut = squeeze_zeros(oPath)">squeeze_zeros</a>(oSdpDn);
+0314 <span class="keyword">end</span>
+0315 <span class="keyword">if</span> ~isempty(oSc)
+0316     oSc = <a href="#_sub13" class="code" title="subfunction oOut = squeeze_zeros(oPath)">squeeze_zeros</a>(oSc);
+0317 <span class="keyword">end</span>
+0318 <span class="comment">% add_bci ---------------------------------------------------</span>
+0319     <a name="_sub1" href="#_subfunctions" class="code">function add_bci(bv, bDense)</a>
+0320         bUp = bDid &amp; ~bDense | ~bDid &amp; bDense;
+0321         bvCaseA = bUp &amp; bv &amp; bvRef &amp; ~(bvHigh_contrast_th &amp; isMSource);
+0322         bvCaseAL = bvCaseA(bv); <span class="comment">% local version</span>
+0323         <span class="keyword">if</span> bDense
+0324             vSing = vPowDn;
+0325         <span class="keyword">else</span>
+0326             vSing = vPowTh;
+0327         <span class="keyword">end</span>
+0328         vSing = vSing(bv);
+0329         <span class="keyword">if</span> bDense
+0330             vAlpha = vAlpha_dn(bv);
+0331             vStep = vStep_dn(bv);
+0332         <span class="keyword">else</span>
+0333             vAlpha = vAlpha_th(bv);
+0334             vStep = vStep_th(bv);
+0335         <span class="keyword">end</span>
+0336         bvSingMin05 = vSing == -0.5;
+0337         bvSingPls05 = vSing == 0.5;
+0338         xiR = zeros(sum(bv), bc_points); <span class="comment">% These are the actual sampling points</span>
+0339         w = xiR;                         <span class="comment">% Not the ones used to track the path (in case a)</span>
+0340         kx = xiR;
+0341         jac = xiR;
+0342         <span class="keyword">if</span> any(bvSingMin05)
+0343             [xiR(bvSingMin05,:), w(bvSingMin05,:)] = <a href="gausslag.html" class="code" title="function [x, w] = gausslag(n, alpha, beta)">gausslag</a>(bc_points, abs(vAlpha(bvSingMin05,:)), -0.5);
+0344         <span class="keyword">end</span>
+0345         <span class="keyword">if</span> any(bvSingPls05)
+0346             [xiR(bvSingPls05,:), w(bvSingPls05,:)] = <a href="gausslag.html" class="code" title="function [x, w] = gausslag(n, alpha, beta)">gausslag</a>(bc_points, abs(vAlpha(bvSingPls05,:)), 0.5);
+0347         <span class="keyword">end</span>
+0348         kc = kc_th*~bDense+kc_dn*bDense;
+0349         <span class="keyword">if</span> any(~bvCaseAL) <span class="comment">% straight-line path</span>
+0350             mStep = <a href="#_sub15" class="code" title="subfunction out = makematC(vIn, n)">makematC</a>(vStep(~bvCaseAL), bc_points);
+0351             kx(~bvCaseAL,:) = mStep.*xiR(~bvCaseAL,:)+kc;
+0352             jac(~bvCaseAL,:) = mStep.*w(~bvCaseAL,:);
+0353         <span class="keyword">end</span>
+0354         <span class="keyword">if</span> any(bvCaseAL)
+0355             nCaseA = sum(bvCaseAL);
+0356             nTrack = bc_points; <span class="comment">% must be even for smooth_path</span>
+0357             TrackLen = 1.001;
+0358             vMin = min(xiR(bvCaseAL,:), [], 2)*TrackLen;
+0359             vMax = max(xiR(bvCaseAL,:), [], 2)*TrackLen;
+0360             xi = <a href="mlinspace.html" class="code" title="function y = mlinspace(d1, d2, n)">mlinspace</a>(vMin, vMax, nTrack);
+0361             vGamma = angle(1j*vA(bvCaseAL)-1j*vC(bvCaseAL)*kc_u/sqrt(kc_d^2-kc_u^2));
+0362             vGamma(vGamma &lt; 0) = vGamma(vGamma&lt;0)+pi;
+0363             g0 = exp(1j*vGamma);
+0364             isImpTh = ones(nCaseA, 1)*bDid;
+0365             isImpDn = isImpTh;
+0366             mKxCaseA = <a href="#_sub3" class="code" title="subfunction mKx = grad_walk(kx0, g0, xi, isImpTh, isImpDn, bv)">grad_walk</a>(kc, g0, xi, isImpTh, isImpDn, bvCaseA);
+0367             x = real(mKxCaseA);
+0368             y = imag(mKxCaseA);
+0369             iCaseAL = find(bvCaseAL);
+0370             iCaseAL = iCaseAL(1);
+0371             [kx(bvCaseAL,:), jac(bvCaseAL,:)] = <a href="smooth_path_vect_LS.html" class="code" title="function [sm_path, jac] = smooth_path_vect_LS(x, y, t, xi, vMax, vX0)">smooth_path_vect_LS</a>(x, y, xi(1,:), xiR(iCaseAL,:), vMax, repmat(kc,nCaseA,1));
+0372             jac(bvCaseAL,:) = jac(bvCaseAL,:).*w(bvCaseAL,:);
+0373         <span class="keyword">end</span>
+0374         bmImLineCross = real(kx) &lt; 0;
+0375         <span class="keyword">if</span> bDense
+0376             isImpDnR = bmImLineCross;
+0377             isImpThR = bmImLineCross;
+0378             isImpDnL = ~bmImLineCross;
+0379             isImpThL = bmImLineCross;
+0380         <span class="keyword">else</span>
+0381             isImpDnR = ~bmImLineCross;
+0382             isImpThR = bmImLineCross;
+0383             isImpDnL = ~bmImLineCross;
+0384             isImpThL = ~bmImLineCross;
+0385         <span class="keyword">end</span>
+0386         <span class="keyword">if</span> bDid
+0387             isImpDR = isImpDnR;
+0388             isImpDL = isImpDnL;
+0389             isImpUR = isImpThR;
+0390             isImpUL = isImpThL;
+0391         <span class="keyword">else</span>
+0392             isImpUR = isImpDnR;
+0393             isImpUL = isImpDnL;
+0394             isImpDR = isImpThR;
+0395             isImpDL = isImpThL;
+0396         <span class="keyword">end</span>
+0397         bUp = xor(bDid, bDense);
+0398         bDown = ~bUp;
+0399         ky_dL = <a href="calc_kc.html" class="code" title="function kc = calc_kc(k0, beta, Er, isImproper)">calc_kc</a>(kc_d, kx, 1, isImpDL);
+0400         ky_uL = <a href="calc_kc.html" class="code" title="function kc = calc_kc(k0, beta, Er, isImproper)">calc_kc</a>(kc_u, kx, 1, isImpUL);
+0401         ky_dR = <a href="calc_kc.html" class="code" title="function kc = calc_kc(k0, beta, Er, isImproper)">calc_kc</a>(kc_d, kx, 1, isImpDR);
+0402         ky_uR = <a href="calc_kc.html" class="code" title="function kc = calc_kc(k0, beta, Er, isImproper)">calc_kc</a>(kc_u, kx, 1, isImpUR);
+0403         <span class="keyword">if</span> bDown
+0404             <span class="keyword">if</span> isempty(oBcD)
+0405                 <a href="#_sub21" class="code" title="subfunction oBcD_constructor">oBcD_constructor</a>;
+0406                 oBcD{2} = oBcD{1};
+0407             <span class="keyword">end</span>
+0408             oBcD{1} = <a href="#_sub17" class="code" title="subfunction oOut = add_points(oOut, bv, xi, jac, kx, ky_d, ky_u)">add_points</a>(oBcD{1}, bv, xiR, jac, kx, ky_dL, ky_uL);
+0409             oBcD{2} = <a href="#_sub17" class="code" title="subfunction oOut = add_points(oOut, bv, xi, jac, kx, ky_d, ky_u)">add_points</a>(oBcD{2}, bv, xiR, jac, kx, ky_dR, ky_uR);
+0410         <span class="keyword">else</span>
+0411             <span class="keyword">if</span> isempty(oBcU)
+0412                 <a href="#_sub22" class="code" title="subfunction oBcU_constructor">oBcU_constructor</a>;
+0413                 oBcU{2} = oBcU{1};
+0414             <span class="keyword">end</span>
+0415             oBcU{1} = <a href="#_sub17" class="code" title="subfunction oOut = add_points(oOut, bv, xi, jac, kx, ky_d, ky_u)">add_points</a>(oBcU{1}, bv, xiR, jac, kx, ky_dL, ky_uL);
+0416             oBcU{2} = <a href="#_sub17" class="code" title="subfunction oOut = add_points(oOut, bv, xi, jac, kx, ky_d, ky_u)">add_points</a>(oBcU{2}, bv, xiR, jac, kx, ky_dR, ky_uR);
+0417         <span class="keyword">end</span>
+0418     <span class="keyword">end</span>
+0419 
+0420 <span class="comment">%%% add_sdp ----------------------------------------------------------------</span>
+0421     <a name="_sub2" href="#_subfunctions" class="code">function bvFix = add_sdp(bv, bDense)</a>
+0422         nBv = sum(bv);
+0423         bvRefL = bvRef &amp; bv; <span class="comment">% a Local version</span>
+0424         <span class="keyword">if</span> any(bvRefL)
+0425             bvCJL = logical(bvCritJump(bv));
+0426         <span class="keyword">else</span>
+0427             bvCJL = zeros(nBv, 1);
+0428         <span class="keyword">end</span>
+0429         <span class="keyword">if</span> bDense
+0430             vSigma = vSigma_dn(bv);
+0431             vSdp_kx = vSdp_dn(bv);
+0432             vGamma = vGamma_CplxSp(bv);
+0433         <span class="keyword">else</span>
+0434             vSigma = vSigma_th(bv);
+0435             vSdp_kx = vSdp_th(bv);
+0436             vGamma = pi/4;
+0437         <span class="keyword">end</span>
+0438         xiR = zeros(nBv, points/2); <span class="comment">% These are the actual sampling points</span>
+0439         wR = xiR;                   <span class="comment">% Not the ones used to track the path</span>
+0440         <span class="keyword">if</span> any(bvCJL)
+0441             pow = 0.5;
+0442             [xiR(bvCJL,:), wR(bvCJL,:)] = <a href="gausshrhermite.html" class="code" title="function [x, w] = gausshrhermite(n, vSigma, beta)">gausshrhermite</a>(points/2, vSigma(bvCJL), pow);
+0443         <span class="keyword">end</span>
+0444         <span class="keyword">if</span> any(~bvCJL)
+0445             pow = 0;
+0446             [xiR(~bvCJL,:), wR(~bvCJL,:)] = <a href="gausshrhermite.html" class="code" title="function [x, w] = gausshrhermite(n, vSigma, beta)">gausshrhermite</a>(points/2, vSigma(~bvCJL), pow);
+0447         <span class="keyword">end</span>
+0448         
+0449         xiR = [-xiR(:,end:-1:1) xiR];
+0450         wR = [wR(:,end:-1:1) wR];
+0451         nTrack = points; <span class="comment">% must be even for smooth_path</span>
+0452         TrackLen = 1.001;
+0453         vMin = min(xiR, [], 2)*TrackLen;
+0454         vMax = max(xiR, [], 2)*TrackLen;
+0455         xi = <a href="mlinspace.html" class="code" title="function y = mlinspace(d1, d2, n)">mlinspace</a>(vMin, vMax, nTrack);
+0456         
+0457         g0_l = exp(1j*vGamma);
+0458         g0_r = -g0_l;
+0459         isImpRightTh = zeros(nBv, 1);
+0460         isImpRightDn = (imag(vSdp_kx) + xi(:,end/2+1).*imag(-g0_r))&lt;0;
+0461         isImpLeftTh = (real(vSdp_kx)+xi(:,end/2+1).*real(-g0_l)&gt;0) &amp; (real(vSdp_kx)&lt;kc_th); <span class="comment">% when sdp near the origin we start on the proper sheet</span>
+0462         isImpLeftDn = isImpLeftTh | (real(vSdp_kx)&gt;kc_th); <span class="comment">% does this work well for cmplx?</span>
+0463         
+0464         xi_sdp_half = xi(:,end/2+1:end);
+0465         mKxSdpLeft = <a href="#_sub3" class="code" title="subfunction mKx = grad_walk(kx0, g0, xi, isImpTh, isImpDn, bv)">grad_walk</a>(vSdp_kx, g0_l, xi_sdp_half, isImpLeftTh, isImpLeftDn, bv);
+0466         mKxSdpLeft = mKxSdpLeft(:, end:-1:1);
+0467         mKxSdpRight = <a href="#_sub3" class="code" title="subfunction mKx = grad_walk(kx0, g0, xi, isImpTh, isImpDn, bv)">grad_walk</a>(vSdp_kx, g0_r, xi_sdp_half, isImpRightTh, isImpRightDn, bv);
+0468         oSdp.kx = [mKxSdpLeft mKxSdpRight];
+0469         
+0470         <span class="comment">% smooth path</span>
+0471         sm_path = zeros(nBv, points);
+0472         jac = sm_path;
+0473         <span class="keyword">if</span> any(bvCJL)
+0474             iCJL = find(bvCJL);
+0475             iCJL = iCJL(1);
+0476             x = real(oSdp.kx(bvCJL,:));
+0477             y = imag(oSdp.kx(bvCJL,:));
+0478             vKx0 = repmat(kc_th, sum(bvCJL), 1);
+0479             [sm_path(bvCJL,:), jac(bvCJL,:)] = <a href="smooth_path_vect_LS.html" class="code" title="function [sm_path, jac] = smooth_path_vect_LS(x, y, t, xi, vMax, vX0)">smooth_path_vect_LS</a>(x, y, xi(iCJL,:), xiR(iCJL,:), vMax(bvCJL), vKx0);
+0480         <span class="keyword">end</span>
+0481         <span class="keyword">if</span> any(~bvCJL)
+0482             iCJL = find(~bvCJL);
+0483             iCJL = iCJL(1);
+0484             x = real(oSdp.kx(~bvCJL,:));
+0485             y = imag(oSdp.kx(~bvCJL,:));
+0486             vKx0 = vSdp_kx(~bvCJL);
+0487             [sm_path(~bvCJL,:), jac(~bvCJL,:)] = <a href="smooth_path_vect_LS.html" class="code" title="function [sm_path, jac] = smooth_path_vect_LS(x, y, t, xi, vMax, vX0)">smooth_path_vect_LS</a>(x, y, xi(iCJL,:), xiR(iCJL,:), vMax(~bvCJL), vKx0);
+0488         <span class="keyword">end</span>
+0489         
+0490         oSdp.kx = sm_path;
+0491         oSdp.jac = (jac.*wR);
+0492         
+0493         <span class="comment">% re-calc isImps</span>
+0494         isImpDn = zeros(nBv, points);
+0495         isImpTh = isImpDn;
+0496         <span class="keyword">if</span> any(bvCJL)
+0497             isImpDn(bvCJL,:) = (real(oSdp.kx(bvCJL,:)) &gt; 0) &amp; (real(oSdp.kx(bvCJL,:)) &lt; kc_th);
+0498             isImpTh(bvCJL,:) = isImpDn(bvCJL,:);
+0499             oIm.Il(bvCritJump) = 1;
+0500             oIm.y_s(bvCritJump) = -y_s;
+0501             oIm.Er(bvCritJump) = Er_d;
+0502         <span class="keyword">end</span>
+0503         <span class="keyword">if</span> any(~bvCJL)
+0504             isImpRightTh = zeros(sum(~bvCJL), 1);
+0505             isImpRightDn = imag(oSdp.kx(~bvCJL, end/2+1))&lt;0;
+0506             isImpLeftTh = (real(oSdp.kx(~bvCJL, end/2)) &gt; 0) &amp; (real(vSdp_kx(~bvCJL)) &lt; kc_th);
+0507             isImpLeftDn = isImpLeftTh | (real(vSdp_kx(~bvCJL)) &gt; kc_th);
+0508             isImpDn(~bvCJL,:) = <a href="#_sub6" class="code" title="subfunction isImp = calc_isImp(mKx, vIsImpR, vIsImpL, kc)">calc_isImp</a>(oSdp.kx(~bvCJL,:), isImpRightDn, isImpLeftDn, kc_dn);
+0509             isImpTh(~bvCJL,:) = <a href="#_sub6" class="code" title="subfunction isImp = calc_isImp(mKx, vIsImpR, vIsImpL, kc)">calc_isImp</a>(oSdp.kx(~bvCJL,:), isImpRightTh, isImpLeftTh, kc_th);
+0510         <span class="keyword">end</span>
+0511         
+0512         <span class="comment">% fix possible error in dense bp interception due to inaccurate path.</span>
+0513         <span class="comment">% it is possible that the path will not intcp, when the exact path</span>
+0514         <span class="comment">% should intcp. This is detected by two conditions:</span>
+0515         <span class="comment">% 1. That the exact path intcps</span>
+0516         <span class="comment">% 2. That the path ended on the proper sheet.</span>
+0517         <span class="keyword">if</span> ~bDense
+0518             bvExactIntcp = vFalse_all;
+0519             bvExactIntcp(bvTran) = bvSpDnIntcp;
+0520             bvExactIntcp(bvRef) = bvUpBpIntcp;
+0521             bvExactIntcp = bvExactIntcp(bv);
+0522             bvTwoConditions = ~isImpDn(:,end) &amp; ~isImpTh(:,end) &amp; bvExactIntcp;
+0523             bvFix = vFalse_all;
+0524             bvFix(bv) = bvTwoConditions;
+0525         <span class="keyword">else</span>
+0526             bvFix = vFalse_all;
+0527         <span class="keyword">end</span>
+0528         <span class="keyword">if</span> bDid
+0529             oSdp.ky_d = <a href="calc_kc.html" class="code" title="function kc = calc_kc(k0, beta, Er, isImproper)">calc_kc</a>(kc_d, oSdp.kx, 1, isImpDn);
+0530             oSdp.ky_u = <a href="calc_kc.html" class="code" title="function kc = calc_kc(k0, beta, Er, isImproper)">calc_kc</a>(kc_u, oSdp.kx, 1, isImpTh);
+0531         <span class="keyword">else</span>
+0532             oSdp.ky_d = <a href="calc_kc.html" class="code" title="function kc = calc_kc(k0, beta, Er, isImproper)">calc_kc</a>(kc_d, oSdp.kx, 1, isImpTh);
+0533             oSdp.ky_u = <a href="calc_kc.html" class="code" title="function kc = calc_kc(k0, beta, Er, isImproper)">calc_kc</a>(kc_u, oSdp.kx, 1, isImpDn);
+0534         <span class="keyword">end</span>
+0535         oSdp.bv = bv;
+0536         <span class="keyword">if</span> bDense
+0537             <span class="keyword">if</span> isempty(oSdpDn)
+0538                 <a href="#_sub18" class="code" title="subfunction oSdpDn_constructor">oSdpDn_constructor</a>;
+0539             <span class="keyword">end</span>
+0540             oSdpDn = <a href="#_sub17" class="code" title="subfunction oOut = add_points(oOut, bv, xi, jac, kx, ky_d, ky_u)">add_points</a>(oSdpDn, oSdp.bv, xiR, oSdp.jac, oSdp.kx,<span class="keyword">...</span>
+0541                 oSdp.ky_d, oSdp.ky_u);
+0542         <span class="keyword">else</span>
+0543             <span class="keyword">if</span> isempty(oSdpTh)
+0544                 <a href="#_sub20" class="code" title="subfunction oSdpTh_constructor">oSdpTh_constructor</a>;
+0545             <span class="keyword">end</span>
+0546             oSdpTh = <a href="#_sub17" class="code" title="subfunction oOut = add_points(oOut, bv, xi, jac, kx, ky_d, ky_u)">add_points</a>(oSdpTh, oSdp.bv, xiR, oSdp.jac, oSdp.kx,<span class="keyword">...</span>
+0547                 oSdp.ky_d, oSdp.ky_u);
+0548         <span class="keyword">end</span>
+0549     <span class="keyword">end</span>
+0550     <a name="_sub3" href="#_subfunctions" class="code">function mKx = grad_walk(kx0, g0, xi, isImpTh, isImpDn, bv)</a>
+0551         nXi = size(xi, 2);
+0552         nBv = sum(bv);
+0553         mKx = zeros(nBv, nXi);
+0554         delta0 = xi(:,1);
+0555         delta = diff(xi, 1, 2);
+0556         delta(:,end+1) = delta(:,end);
+0557         step = -g0.*delta0;
+0558         kx = kx0 + step;
+0559         <span class="keyword">for</span> n = 1:nXi
+0560             mKx(:,n) = kx;
+0561             dPh = <a href="#_sub4" class="code" title="subfunction dPh = phase_factor_diff(s, isImpTh, isImpDn, bv)">phase_factor_diff</a>(kx, isImpTh, isImpDn, bv);
+0562             g = imag(dPh)+1j*real(dPh);
+0563             next_step = -delta(:,n).*g./abs(g);
+0564             step = next_step;
+0565             kx = kx + step;
+0566             isImpTh = xor(isImpTh, <a href="#_sub7" class="code" title="subfunction out = bc_crossed(kx1, kx2, kc)">bc_crossed</a>(kx-step, kx, kc_th));
+0567             isImpDn = xor(isImpDn, <a href="#_sub7" class="code" title="subfunction out = bc_crossed(kx1, kx2, kc)">bc_crossed</a>(kx-step, kx, kc_dn));
+0568         <span class="keyword">end</span>
+0569     <span class="keyword">end</span>
+0570 
+0571     <a name="_sub4" href="#_subfunctions" class="code">function dPh = phase_factor_diff(s, isImpTh, isImpDn, bv)</a>
+0572         <span class="keyword">if</span> bDid
+0573             isImpU = isImpTh;
+0574             isImpD = isImpDn;
+0575         <span class="keyword">else</span>
+0576             isImpD = isImpTh;
+0577             isImpU = isImpDn;
+0578         <span class="keyword">end</span>
+0579         dPh = vA(bv) + vB(bv).*<a href="#_sub5" class="code" title="subfunction out = ky_diff(kc, kx, isImp)">ky_diff</a>(kc_u, s, isImpU) + vC(bv).*<a href="#_sub5" class="code" title="subfunction out = ky_diff(kc, kx, isImp)">ky_diff</a>(kc_d, s, isImpD);
+0580     <span class="keyword">end</span>
+0581 
+0582     <a name="_sub5" href="#_subfunctions" class="code">function out = ky_diff(kc, kx, isImp)</a>
+0583         out = -kx./<a href="calc_kc.html" class="code" title="function kc = calc_kc(k0, beta, Er, isImproper)">calc_kc</a>(kc, kx, 1, isImp);
+0584     <span class="keyword">end</span>
+0585 
+0586     <a name="_sub6" href="#_subfunctions" class="code">function isImp = calc_isImp(mKx, vIsImpR, vIsImpL, kc)</a>
+0587         n2 = size(mKx,2)/2;
+0588         n1 = size(mKx,1);
+0589         mIsImpR = zeros(n1,n2);
+0590         mIsImpL = mIsImpR;
+0591         mIsImpR(:,1) = vIsImpR;
+0592         mIsImpL(:,end) = vIsImpL;
+0593         <span class="keyword">for</span> iKx = 2:n2
+0594             kxR = mKx(:,iKx+end/2);
+0595             kxL = mKx(:,-iKx+1+end/2);
+0596             kxR_prev = mKx(:,iKx+end/2-1);
+0597             kxL_prev = mKx(:,-iKx+2+end/2);
+0598             vIsImpR = xor(vIsImpR, <a href="#_sub7" class="code" title="subfunction out = bc_crossed(kx1, kx2, kc)">bc_crossed</a>(kxR_prev, kxR, kc));
+0599             vIsImpL = xor(vIsImpL, <a href="#_sub7" class="code" title="subfunction out = bc_crossed(kx1, kx2, kc)">bc_crossed</a>(kxL_prev, kxL, kc));
+0600             mIsImpR(:,iKx) = vIsImpR;
+0601             mIsImpL(:,end-iKx+1) = vIsImpL;
+0602         <span class="keyword">end</span>
+0603         isImp = [mIsImpL mIsImpR];
+0604     <span class="keyword">end</span>
+0605 
+0606     <a name="_sub7" href="#_subfunctions" class="code">function out = bc_crossed(kx1, kx2, kc)</a>
+0607         out = (sign(real(kx1)) ~= sign(real(kx2))) | <span class="keyword">...</span>
+0608             ((sign(imag(kx1)) ~= sign(imag(kx2))) &amp; (kc &gt; (real(kx1)-imag(kx1)./imag(kx1-kx2).*real(kx1-kx2))));
+0609     <span class="keyword">end</span>
+0610 
+0611 <span class="comment">%% add_qs -----------------------------------------------------------------</span>
+0612     <a name="_sub8" href="#_subfunctions" class="code">function add_qs</a>
+0613         <span class="comment">% set-up images</span>
+0614         <span class="keyword">if</span> isMSource
+0615             <span class="comment">% Reflected</span>
+0616             oIm.Il(bvRef &amp; bvQs) = (Er_u-Er_d)/(Er_u+Er_d);
+0617             oIm.y_s(bvRef &amp; bvQs) = -y_s;
+0618             oIm.Er(bvRef &amp; bvQs) = Er_d;
+0619             <span class="comment">% Transmitted</span>
+0620             oIm.Il(bvTran &amp; bvQs) = 2*Er_u/(Er_u+Er_d);
+0621             oIm.y_s(bvTran &amp; bvQs) = y_s;
+0622             oIm.Er(bvTran &amp; bvQs) = Er_u;
+0623         <span class="keyword">else</span>
+0624             <span class="comment">% Only Trans. Ref has no image</span>
+0625             oIm.Il(bvTran &amp; bvQs) = 1;
+0626             oIm.y_s(bvTran &amp; bvQs) = y_s;
+0627             oIm.Er(bvTran &amp; bvQs) = Er_u;
+0628         <span class="keyword">end</span>
+0629         oIm.bQs(bvQs) = 1;
+0630         oIm.x_s = repmat(x_s, nX, 1);
+0631         <span class="comment">% calc_path</span>
+0632         minX = -pi/2*(1-0.00001);
+0633         maxX = pi/2*(1-0.00001);
+0634         bvRQ = bvRef &amp; bvQs;
+0635         bvTQ = bvTran &amp; bvQs;
+0636         bvRX = bvRQ &amp; bvXgrY;
+0637         bvTX = bvTQ &amp; bvXgrY;
+0638         bvRY = bvRQ &amp; ~bvXgrY;
+0639         bvTY = bvTQ &amp; ~bvXgrY;
+0640         <span class="keyword">if</span> isempty(oSdpTh)
+0641             <a href="#_sub20" class="code" title="subfunction oSdpTh_constructor">oSdpTh_constructor</a>;
+0642         <span class="keyword">end</span>
+0643         <a href="#_sub11" class="code" title="subfunction rule_and_path(bv, bR)">rule_and_path</a>(bvRX, 1);
+0644         <a href="#_sub11" class="code" title="subfunction rule_and_path(bv, bR)">rule_and_path</a>(bvRY, 1);
+0645         <a href="#_sub11" class="code" title="subfunction rule_and_path(bv, bR)">rule_and_path</a>(bvTX, 0);
+0646         <a href="#_sub11" class="code" title="subfunction rule_and_path(bv, bR)">rule_and_path</a>(bvTY, 0);
+0647         oSdpTh.ky_d(bvQs,:) = <a href="calc_kc.html" class="code" title="function kc = calc_kc(k0, beta, Er, isImproper)">calc_kc</a>(kc_d, oSdpTh.kx(bvQs,:), 1, 0);
+0648         oSdpTh.ky_u(bvQs,:) = <a href="calc_kc.html" class="code" title="function kc = calc_kc(k0, beta, Er, isImproper)">calc_kc</a>(kc_u, oSdpTh.kx(bvQs,:), 1, 0);
+0649         oSdpTh.bv = oSdpTh.bv | bvQs;
+0650         
+0651         <a name="_sub9" href="#_subfunctions" class="code">function w = weight_fun(t, bR)</a>
+0652             vKx = <a href="#_sub10" class="code" title="subfunction [vKx, vJac] = path(xi)">path</a>(t);
+0653             oPath.kx = vKx;
+0654             oPath.ky_d = <a href="calc_kc.html" class="code" title="function kc = calc_kc(k0, beta, Er, isImproper)">calc_kc</a>(kc_d, vKx, 1, 0);
+0655             oPath.ky_u = <a href="calc_kc.html" class="code" title="function kc = calc_kc(k0, beta, Er, isImproper)">calc_kc</a>(kc_u, vKx, 1, 0);
+0656             <span class="comment">% Only the sign of Y matters for slowly varying:</span>
+0657             Y = -1*bR + 1*~bR;
+0658             slvar = <a href="slowly_varying_qs_vect.html" class="code" title="function field = slowly_varying_qs_vect(oPath, vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, bMSource)">slowly_varying_qs_vect</a>(oPath, x_s+1, Y, x_s,<span class="keyword">...</span>
+0659                 y_s, k0, Er_d, Er_u, sComp, isMSource);
+0660             w = abs(slvar);
+0661         <span class="keyword">end</span>
+0662         
+0663         <a name="_sub10" href="#_subfunctions" class="code">function [vKx, vJac] = path(xi)</a>
+0664             [rows, cols] = size(xi);
+0665             xi = xi(:);
+0666             x1 = 2*kc_dn;
+0667             x0 = 0;
+0668             dilate = 0.5;
+0669             A = 1/(x0-x1);
+0670             t = (x1-x0)*dilate*tan(xi)+(x1+x0)/2*0;
+0671             vKx = t+1j*A*(t-x1).*(t-x0);
+0672             vJac = (1+1j*A*(t-x0)+1j*A*(t-x1)).*(x1-x0).*dilate.*(1+tan(xi).^2);
+0673             vJac = reshape(vJac, rows, cols);
+0674             vKx = reshape(vKx, rows, cols);
+0675         <span class="keyword">end</span>
+0676         <a name="_sub11" href="#_subfunctions" class="code">function rule_and_path(bv, bR)</a>
+0677             <span class="keyword">if</span> any(bv)
+0678                 <span class="keyword">switch</span> lower(qsRule)
+0679                     <span class="keyword">case</span> <span class="string">'discretization'</span>
+0680                         [xi, w] = <a href="gaussGen.html" class="code" title="function [x, w] = gaussGen(n, minX, maxX, f)">gaussGen</a>(points, minX, maxX, @(t)<a href="#_sub9" class="code" title="subfunction w = weight_fun(t, bR)">weight_fun</a>(t, bR));
+0681                     <span class="keyword">case</span> <span class="string">'legendre'</span>
+0682                         [xi,w] = <a href="gaussquad.html" class="code" title="function [xx, ww] = gaussquad(n, a, b)">gaussquad</a>(points, minX, maxX);
+0683                     <span class="keyword">otherwise</span>
+0684                         error(<span class="string">'NDSDP: unrecognized quasi-static rule. Options.quasistaticRule should be either ''discretization'', or ''Legendre'''</span>)
+0685                 <span class="keyword">end</span>
+0686                 xi = xi(:)'; w = w(:)';
+0687                 nBv = sum(bv);
+0688                 oSdpTh.xi(bv,:) = <a href="#_sub14" class="code" title="subfunction out = makematR(vIn, n)">makematR</a>(xi, nBv);
+0689                 [kx, jac] = <a href="#_sub10" class="code" title="subfunction [vKx, vJac] = path(xi)">path</a>(xi);
+0690                 oSdpTh.kx(bv,:) = <a href="#_sub14" class="code" title="subfunction out = makematR(vIn, n)">makematR</a>(kx, nBv);
+0691                 jacw = jac.*w;
+0692                 oSdpTh.jac(bv,:) = <a href="#_sub14" class="code" title="subfunction out = makematR(vIn, n)">makematR</a>(jacw, nBv);
+0693             <span class="keyword">end</span>
+0694         <span class="keyword">end</span>
+0695     <span class="keyword">end</span>
+0696 
+0697 <span class="comment">%% add_sc --------------------------------------------------</span>
+0698     <a name="_sub12" href="#_subfunctions" class="code">function add_sc</a>
+0699         nSc = sum(bvSc);
+0700         minX = 0;
+0701         maxX = pi;
+0702         factor_sl = 4; <span class="comment">%num of points factor</span>
+0703         factor_circ = factor_sl/(factor_sl-2); <span class="comment">% to keep total to points</span>
+0704         factor_sl = factor_sl/sc_factor;
+0705         factor_circ = factor_circ/sc_factor;
+0706         [xiC, wC] = <a href="gaussquad.html" class="code" title="function [xx, ww] = gaussquad(n, a, b)">gaussquad</a>(round(points/factor_circ), minX, maxX);
+0707         
+0708         xiC = <a href="#_sub14" class="code" title="subfunction out = makematR(vIn, n)">makematR</a>(xiC(:).', nSc);
+0709         wC = <a href="#_sub14" class="code" title="subfunction out = makematR(vIn, n)">makematR</a>(wC(:).', nSc);
+0710         
+0711         <span class="comment">% make a semi-circle</span>
+0712         k_tag = (kc_dn+kc_th)/2;
+0713         vK_rad = max((kc_dn-kc_th), min(2*pi./vA(bvSc)/2, k_tag));
+0714         k_rad = <a href="#_sub15" class="code" title="subfunction out = makematC(vIn, n)">makematC</a>(vK_rad, round(points/factor_circ));
+0715         kx_circ = k_tag + exp(1j*(pi-xiC)).*k_rad;
+0716         jac_circ = -1j*k_rad.*exp(1j*(pi-xiC)).*wC;
+0717         
+0718         <span class="comment">% make two straight lines</span>
+0719         [xiR, wR] = <a href="gausslag.html" class="code" title="function [x, w] = gausslag(n, alpha, beta)">gausslag</a>(round(points/factor_sl), abs(vAlpha_sdp(bvSc)),0);
+0720         mStep_right_sdp = <a href="#_sub15" class="code" title="subfunction out = makematC(vIn, n)">makematC</a>(vStep_right_sdp(bvSc), round(points/factor_sl));
+0721         k_rad = <a href="#_sub15" class="code" title="subfunction out = makematC(vIn, n)">makematC</a>(vK_rad, round(points/factor_sl));
+0722         kx_right = mStep_right_sdp.*xiR+k_tag+k_rad;
+0723         jac_right = mStep_right_sdp.*wR;
+0724         
+0725         kx_left = -conj(mStep_right_sdp).*xiR(:,end:-1:1)+k_tag-k_rad;
+0726         jac_left = conj(mStep_right_sdp).*wR(:,end:-1:1);
+0727         
+0728         xi = [xiR(:,end:-1:1) xiC xiR];
+0729         kx = [kx_left kx_circ kx_right];
+0730         <span class="keyword">if</span> isempty(oSc)
+0731             <a href="#_sub19" class="code" title="subfunction oSc_constructor">oSc_constructor</a>;
+0732         <span class="keyword">end</span>
+0733         oSc.xi(bvSc,:) = xi;
+0734         oSc.kx(bvSc,:) = kx;
+0735         oSc.jac(bvSc,:) = [jac_left jac_circ jac_right];
+0736         isImpUD = (real(kx)&gt;0) &amp; (real(kx)&lt;kc_th) &amp; (imag(kx)&lt;0);
+0737         oSc.ky_d(bvSc,:) = <a href="calc_kc.html" class="code" title="function kc = calc_kc(k0, beta, Er, isImproper)">calc_kc</a>(kc_d, kx, 1, isImpUD);
+0738         oSc.ky_u(bvSc,:) = <a href="calc_kc.html" class="code" title="function kc = calc_kc(k0, beta, Er, isImproper)">calc_kc</a>(kc_u, kx, 1, isImpUD);
+0739         oSc.bv = oSc.bv | bvSc;
+0740     <span class="keyword">end</span>
+0741 
+0742 <span class="comment">%% Utilities -------------------------------------------------------------</span>
+0743 
+0744     <a name="_sub13" href="#_subfunctions" class="code">function oOut = squeeze_zeros(oPath)</a>
+0745         bv = oPath.bv;
+0746         oOut = oPath;
+0747         oOut.xi = oPath.xi(bv,:);
+0748         oOut.kx =  oPath.kx(bv,:);
+0749         oOut.jac = oPath.jac(bv,:);
+0750         oOut.ky_d = oPath.ky_d(bv,:);
+0751         oOut.ky_u = oPath.ky_u(bv,:);
+0752     <span class="keyword">end</span>
+0753 
+0754     <a name="_sub14" href="#_subfunctions" class="code">function out = makematR(vIn, n)</a>
+0755         out = repmat(vIn, n, 1);
+0756     <span class="keyword">end</span>
+0757     <a name="_sub15" href="#_subfunctions" class="code">function out = makematC(vIn, n)</a>
+0758         out = repmat(vIn, 1, n);
+0759     <span class="keyword">end</span>
+0760 
+0761     <a name="_sub16" href="#_subfunctions" class="code">function alpha = calc_alpha(bDense, step)</a>
+0762         s = 2*((bDid &amp;&amp; bDense) || (~bDid &amp;&amp; ~bDense))-1;
+0763         s_d = s;
+0764         s_u(bvRef) = s;
+0765         s_u(bvTran) = -s;
+0766         s_u = s_u(:);
+0767         alpha = vA.*imag(step)+(s_u.*abs(vY) + s_d.*abs(y_s)).*abs(real(step));
+0768     <span class="keyword">end</span>
+0769 
+0770     <a name="_sub17" href="#_subfunctions" class="code">function oOut = add_points(oOut, bv, xi, jac, kx, ky_d, ky_u)</a>
+0771         oOut.bv = oOut.bv | bv;
+0772         oOut.xi(bv,:) = xi;
+0773         oOut.jac(bv,:) = jac;
+0774         oOut.kx(bv,:) = kx;
+0775         oOut.ky_d(bv,:) = ky_d;
+0776         oOut.ky_u(bv,:) = ky_u;
+0777     <span class="keyword">end</span>
+0778 
+0779 <span class="comment">%% Constructors -----------------------------------------------------</span>
+0780     <a name="_sub18" href="#_subfunctions" class="code">function oSdpDn_constructor</a>
+0781         mZeros = zeros(nX, points);
+0782         oSdpDn.xi = mZeros;
+0783         oSdpDn.kx =  mZeros;
+0784         oSdpDn.jac = mZeros;
+0785         oSdpDn.ky_u = mZeros;
+0786         oSdpDn.ky_d = mZeros;
+0787         oSdpDn.bv = zeros(nX, 1);
+0788     <span class="keyword">end</span>
+0789 
+0790     <a name="_sub19" href="#_subfunctions" class="code">function oSc_constructor</a>
+0791         mZeros = zeros(nX, points*sc_factor);
+0792         oSc.xi = mZeros;
+0793         oSc.kx =  mZeros;
+0794         oSc.jac = mZeros;
+0795         oSc.ky_u = mZeros;
+0796         oSc.ky_d = mZeros;
+0797         oSc.bv = zeros(nX, 1);
+0798     <span class="keyword">end</span>
+0799 
+0800     <a name="_sub20" href="#_subfunctions" class="code">function oSdpTh_constructor</a>
+0801         mZeros = zeros(nX, points);
+0802         oSdpTh.xi = mZeros;
+0803         oSdpTh.kx =  mZeros;
+0804         oSdpTh.jac = mZeros;
+0805         oSdpTh.ky_u = mZeros;
+0806         oSdpTh.ky_d = mZeros;
+0807         oSdpTh.bv = zeros(nX, 1);
+0808     <span class="keyword">end</span>
+0809 
+0810     <a name="_sub21" href="#_subfunctions" class="code">function oBcD_constructor</a>
+0811         mZeros = zeros(nX, bc_points);
+0812         oBcD{1}.xi = mZeros;
+0813         oBcD{1}.kx =  mZeros;
+0814         oBcD{1}.jac = mZeros;
+0815         oBcD{1}.ky_u = mZeros;
+0816         oBcD{1}.ky_d = mZeros;
+0817         oBcD{1}.bv = zeros(nX, 1);
+0818     <span class="keyword">end</span>
+0819 
+0820     <a name="_sub22" href="#_subfunctions" class="code">function oBcU_constructor</a>
+0821         mZeros = zeros(nX, bc_points);
+0822         oBcU{1}.xi = mZeros;
+0823         oBcU{1}.kx =  mZeros;
+0824         oBcU{1}.jac = mZeros;
+0825         oBcU{1}.ky_u = mZeros;
+0826         oBcU{1}.ky_d = mZeros;
+0827         oBcU{1}.bv = zeros(nX, 1);
+0828     <span class="keyword">end</span>
+0829     <a name="_sub23" href="#_subfunctions" class="code">function ph = phase_factor(s, isImpTh, isImpDn, bv)</a>
+0830         <span class="keyword">if</span> bDid
+0831             isImpU = isImpTh;
+0832             isImpD = isImpDn;
+0833         <span class="keyword">else</span>
+0834             isImpD = isImpTh;
+0835             isImpU = isImpDn;
+0836         <span class="keyword">end</span>
+0837         <span class="keyword">if</span> any(vB(bv))
+0838             kyup = <a href="calc_kc.html" class="code" title="function kc = calc_kc(k0, beta, Er, isImproper)">calc_kc</a>(kc_u, s, 1, isImpU);
+0839         <span class="keyword">else</span>
+0840             kyup = 0;
+0841         <span class="keyword">end</span>
+0842         ph = vA(bv).*s + vB(bv).*kyup + vC(bv).*<a href="calc_kc.html" class="code" title="function kc = calc_kc(k0, beta, Er, isImproper)">calc_kc</a>(kc_d, s, 1, isImpD);
+0843     <span class="keyword">end</span>
+0844 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 05-May-2015 18:03:31 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

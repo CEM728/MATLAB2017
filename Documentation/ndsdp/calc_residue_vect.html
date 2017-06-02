@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of calc_residue_vect</title>
+  <meta name="keywords" content="calc_residue_vect">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">ndsdp</a> &gt; calc_residue_vect.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ndsdp&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>calc_residue_vect
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function res = calc_residue_vect(vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, oIm, oPole, bvDown, bv) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="calc_kc.html" class="code" title="function kc = calc_kc(k0, beta, Er, isImproper)">calc_kc</a>	kc = calc_kc(k0, beta, Er, isImproper)</li><li><a href="integrand_vect.html" class="code" title="function field = integrand_vect(oPath, vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, bMSource, oIm)">integrand_vect</a>	</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="calc_si_integral.html" class="code" title="function [integral, oMasks, oSdpTh, oSdpDn, oBcD, oBcU, oSc, oIm, oPole] = calc_si_integral(vX, vY, x_s, y_s, k0, Er_d, Er_u, points, sComp, isMSource, qsRule)">calc_si_integral</a>	Written by Amit Hochman.</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function res = calc_residue_vect(vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, oIm, oPole, bvDown, bv)</a>
+0002 vStep = bvDown.*oPole.vStep_d(bv) + oPole.vStep_u(bv).*~bvDown;
+0003 k_plsmin = k0*(bvDown.*sqrt(Er_d)+ ~bvDown.*sqrt(Er_u));
+0004 vGamma = bvDown.*oPole.vGamma_d(bv) + ~bvDown.*oPole.vGamma_u(bv);
+0005 vSing = bvDown.*oPole.vSing_d(bv) + ~bvDown.*oPole.vSing_u(bv);
+0006 k_pole = oPole.k_pole;
+0007 t_pole = (1./vStep.*(k_pole./k_plsmin-1));
+0008 
+0009 bMSource = 1;
+0010 bvDense = bvDown &amp; (Er_d &gt; Er_u) | ~bvDown &amp; (Er_d &lt; Er_u);
+0011 bvOnRight = ~bvDense;
+0012 
+0013 isImpDn = 1;
+0014 isImpTh = 0;
+0015 
+0016 bDiD = Er_d &gt; Er_u;
+0017 isImproper_d = isImpDn*bDiD + isImpTh*~bDiD;
+0018 isImproper_u = isImpTh*bDiD + isImpDn*~bDiD;
+0019 <span class="comment">% because k_pole is real, and we want the square-root to be continuous with</span>
+0020 <span class="comment">% its value below in the fourth quadrant, we must do the following:</span>
+0021 isImproper_d = ~isImproper_d;
+0022 isImproper_u = ~isImproper_u;
+0023 nXY = length(vX(bv));
+0024 oPath.kx = repmat(k_pole,nXY,1);
+0025 oPath.ky_d = repmat(<a href="calc_kc.html" class="code" title="function kc = calc_kc(k0, beta, Er, isImproper)">calc_kc</a>(k0, k_pole, Er_d, isImproper_d),nXY,1);
+0026 oPath.ky_u = repmat(<a href="calc_kc.html" class="code" title="function kc = calc_kc(k0, beta, Er, isImproper)">calc_kc</a>(k0, k_pole, Er_u, isImproper_u),nXY,1);
+0027 oPath.bv = bv;
+0028 field_regular = <a href="integrand_vect.html" class="code" title="function field = integrand_vect(oPath, vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, bMSource, oIm)">integrand_vect</a>(oPath, vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, bMSource, oIm);
+0029 bvSign = bvOnRight+~bvOnRight*(-1);
+0030 res = bvSign.*exp(+vGamma.*t_pole)./t_pole.^vSing.*field_regular./vStep./k_plsmin;
+0031</pre></div>
+<hr><address>Generated on Tue 05-May-2015 18:03:31 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

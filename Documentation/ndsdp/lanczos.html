@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of lanczos</title>
+  <meta name="keywords" content="lanczos">
+  <meta name="description" content="LANCZOS Lanczos algorithm.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">ndsdp</a> &gt; lanczos.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ndsdp&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>lanczos
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>LANCZOS Lanczos algorithm.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function ab=lanczos(N,xw) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> LANCZOS Lanczos algorithm.
+
+    Given the discrete inner product whose nodes are contained 
+    in the first column, and whose weights are contained in the 
+    second column, of the nx2 array xw, the call ab=LANCZOS(n,xw)
+    generates the first n recurrence coefficients ab of the 
+    corresponding discrete orthogonal polynomials. The n alpha-
+    coefficients are stored in the first column, the n beta-
+    coefficients in the second column, of the nx2 array ab.
+
+    The script is adapted from the routine RKPW in
+    W.B. Gragg and W.J. Harrod, ``The numerically stable 
+    reconstruction of Jacobi matrices from spectral data'', 
+    Numer. Math. 44 (1984), 317-335.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="mcdis.html" class="code" title="function [ab,Ncap,kount]=mcdis(N,eps0,quad,Nmax)">mcdis</a>	MCDIS Multiple-component discretization procedure.</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% LANCZOS Lanczos algorithm.</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">%    Given the discrete inner product whose nodes are contained</span>
+0004 <span class="comment">%    in the first column, and whose weights are contained in the</span>
+0005 <span class="comment">%    second column, of the nx2 array xw, the call ab=LANCZOS(n,xw)</span>
+0006 <span class="comment">%    generates the first n recurrence coefficients ab of the</span>
+0007 <span class="comment">%    corresponding discrete orthogonal polynomials. The n alpha-</span>
+0008 <span class="comment">%    coefficients are stored in the first column, the n beta-</span>
+0009 <span class="comment">%    coefficients in the second column, of the nx2 array ab.</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">%    The script is adapted from the routine RKPW in</span>
+0012 <span class="comment">%    W.B. Gragg and W.J. Harrod, ``The numerically stable</span>
+0013 <span class="comment">%    reconstruction of Jacobi matrices from spectral data'',</span>
+0014 <span class="comment">%    Numer. Math. 44 (1984), 317-335.</span>
+0015 <span class="comment">%</span>
+0016 <a name="_sub0" href="#_subfunctions" class="code">function ab=lanczos(N,xw)</a>
+0017 Ncap=size(xw,1);
+0018 <span class="keyword">if</span>(N&lt;=0 | N&gt;Ncap), error(<span class="string">'N out of range'</span>), <span class="keyword">end</span>
+0019 p0=xw(:,1); p1=zeros(Ncap,1); p1(1)=xw(1,2);
+0020 <span class="keyword">for</span> n=1:Ncap-1
+0021   pn=xw(n+1,2); gam=1; sig=0; t=0; xlam=xw(n+1,1);
+0022   <span class="keyword">for</span> k=1:n+1
+0023     rho=p1(k)+pn; tmp=gam*rho; tsig=sig;
+0024     <span class="keyword">if</span> rho&lt;=0
+0025       gam=1; sig=0;
+0026     <span class="keyword">else</span>
+0027       gam=p1(k)/rho;
+0028       sig=pn/rho;
+0029     <span class="keyword">end</span>
+0030     tk=sig*(p0(k)-xlam)-gam*t;
+0031     p0(k)=p0(k)-(tk-t); t=tk;
+0032     <span class="keyword">if</span> sig&lt;=0
+0033       pn=tsig*p1(k);
+0034     <span class="keyword">else</span>
+0035       pn=(t^2)/sig;
+0036     <span class="keyword">end</span>
+0037     tsig=sig; p1(k)=tmp;
+0038   <span class="keyword">end</span>
+0039 <span class="keyword">end</span>
+0040 ab=[p0(1:N) p1(1:N)];</pre></div>
+<hr><address>Generated on Tue 05-May-2015 18:03:31 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

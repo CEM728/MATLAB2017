@@ -1,0 +1,483 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of ndsdpGui</title>
+  <meta name="keywords" content="ndsdpGui">
+  <meta name="description" content="NDSDPGUI M-file for ndsdpGui.fig">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">ndsdp</a> &gt; ndsdpGui.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ndsdp&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>ndsdpGui
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>NDSDPGUI M-file for ndsdpGui.fig</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function varargout = ndsdpGui(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> NDSDPGUI M-file for ndsdpGui.fig
+      NDSDPGUI, by itself, creates a new NDSDPGUI or raises the existing
+      singleton*.
+
+      H = NDSDPGUI returns the handle to a new NDSDPGUI or the handle to
+      the existing singleton*.
+
+      NDSDPGUI('CALLBACK',hObject,eventData,handles,...) calls the local
+      function named CALLBACK in NDSDPGUI.M with the given input arguments.
+
+      NDSDPGUI('Property','Value',...) creates a new NDSDPGUI or raises the
+      existing singleton*.  Starting from the left, property value pairs are
+      applied to the GUI before ndsdpGui_OpeningFcn gets called.  An
+      unrecognized property name or invalid value makes property application
+      stop.  All inputs are passed to ndsdpGui_OpeningFcn via varargin.
+
+      *See GUI Options on GUIDE's Tools menu.  Choose &quot;GUI allows only one
+      instance to run (singleton)&quot;.
+
+ See also: GUIDE, GUIDATA, GUIHANDLES</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="initialize_globals.html" class="code" title="">initialize_globals</a>	</li><li><a href="ndsdp.html" class="code" title="function [field, nPoints] = ndsdp(EvalAt, Source, permittivityLowerRegion,permittivityUpperRegion, componentString, Options)">ndsdp</a>	[field, nPoints] = ndsdp(EvalAt, Source, permittivityLowerRegion, permittivityUpperRegion, componentString, Options)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function ndsdpGui_OpeningFcn(hObject, eventdata, handles, varargin)</a></li><li><a href="#_sub2" class="code">function varargout = ndsdpGui_OutputFcn(hObject, eventdata, handles)</a></li><li><a href="#_sub3" class="code">function zoomIn_Callback(hObject, eventdata, handles)</a></li><li><a href="#_sub4" class="code">function zoomOut_Callback(hObject, eventdata, handles)</a></li><li><a href="#_sub5" class="code">function animate_Callback(hObject, eventdata, handles)</a></li><li><a href="#_sub6" class="code">function permLower_Callback(hObject, eventdata, handles)</a></li><li><a href="#_sub7" class="code">function permLower_CreateFcn(hObject, eventdata, handles)</a></li><li><a href="#_sub8" class="code">function permUpper_Callback(hObject, eventdata, handles)</a></li><li><a href="#_sub9" class="code">function permUpper_CreateFcn(hObject, eventdata, handles)</a></li><li><a href="#_sub10" class="code">function component_Callback(hObject, eventdata, handles)</a></li><li><a href="#_sub11" class="code">function component_CreateFcn(hObject, eventdata, handles)</a></li><li><a href="#_sub12" class="code">function complexPart_Callback(hObject, eventdata, handles)</a></li><li><a href="#_sub13" class="code">function complexPart_CreateFcn(hObject, eventdata, handles)</a></li><li><a href="#_sub14" class="code">function sourceType_SelectionChangeFcn(hObject, eventdata, handles)</a></li><li><a href="#_sub15" class="code">function els_Callback(hObject, eventdata, handles)</a></li><li><a href="#_sub16" class="code">function mls_Callback(hObject, eventdata, handles)</a></li><li><a href="#_sub17" class="code">function calc_Callback(hObject, eventdata, handles)</a></li><li><a href="#_sub18" class="code">function update_axes(hObject, handles)</a></li><li><a href="#_sub19" class="code">function els_ButtonDownFcn(hObject, eventdata, handles)</a></li><li><a href="#_sub20" class="code">function figure1_WindowButtonDownFcn(hObject, eventdata, handles)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function varargout = ndsdpGui(varargin)</a>
+0002 <span class="comment">% NDSDPGUI M-file for ndsdpGui.fig</span>
+0003 <span class="comment">%      NDSDPGUI, by itself, creates a new NDSDPGUI or raises the existing</span>
+0004 <span class="comment">%      singleton*.</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%      H = NDSDPGUI returns the handle to a new NDSDPGUI or the handle to</span>
+0007 <span class="comment">%      the existing singleton*.</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">%      NDSDPGUI('CALLBACK',hObject,eventData,handles,...) calls the local</span>
+0010 <span class="comment">%      function named CALLBACK in NDSDPGUI.M with the given input arguments.</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">%      NDSDPGUI('Property','Value',...) creates a new NDSDPGUI or raises the</span>
+0013 <span class="comment">%      existing singleton*.  Starting from the left, property value pairs are</span>
+0014 <span class="comment">%      applied to the GUI before ndsdpGui_OpeningFcn gets called.  An</span>
+0015 <span class="comment">%      unrecognized property name or invalid value makes property application</span>
+0016 <span class="comment">%      stop.  All inputs are passed to ndsdpGui_OpeningFcn via varargin.</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">%      *See GUI Options on GUIDE's Tools menu.  Choose &quot;GUI allows only one</span>
+0019 <span class="comment">%      instance to run (singleton)&quot;.</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">% See also: GUIDE, GUIDATA, GUIHANDLES</span>
+0022 
+0023 <span class="comment">% Edit the above text to modify the response to help ndsdpGui</span>
+0024 
+0025 <span class="comment">% Last Modified by GUIDE v2.5 02-Jul-2009 14:27:20</span>
+0026 
+0027 <span class="comment">% Begin initialization code - DO NOT EDIT</span>
+0028 gui_Singleton = 1;
+0029 gui_State = struct(<span class="string">'gui_Name'</span>,       mfilename, <span class="keyword">...</span>
+0030     <span class="string">'gui_Singleton'</span>,  gui_Singleton, <span class="keyword">...</span>
+0031     <span class="string">'gui_OpeningFcn'</span>, @<a href="#_sub1" class="code" title="subfunction ndsdpGui_OpeningFcn(hObject, eventdata, handles, varargin)">ndsdpGui_OpeningFcn</a>, <span class="keyword">...</span>
+0032     <span class="string">'gui_OutputFcn'</span>,  @<a href="#_sub2" class="code" title="subfunction varargout = ndsdpGui_OutputFcn(hObject, eventdata, handles)">ndsdpGui_OutputFcn</a>, <span class="keyword">...</span>
+0033     <span class="string">'gui_LayoutFcn'</span>,  [] , <span class="keyword">...</span>
+0034     <span class="string">'gui_Callback'</span>,   []);
+0035 <span class="keyword">if</span> nargin &amp;&amp; ischar(varargin{1})
+0036     gui_State.gui_Callback = str2func(varargin{1});
+0037 <span class="keyword">end</span>
+0038 
+0039 <span class="keyword">if</span> nargout
+0040     [varargout{1:nargout}] = gui_mainfcn(gui_State, varargin{:});
+0041 <span class="keyword">else</span>
+0042     gui_mainfcn(gui_State, varargin{:});
+0043 <span class="keyword">end</span>
+0044 <span class="comment">% End initialization code - DO NOT EDIT</span>
+0045 
+0046 
+0047 <span class="comment">% --- Executes just before ndsdpGui is made visible.</span>
+0048 <a name="_sub1" href="#_subfunctions" class="code">function ndsdpGui_OpeningFcn(hObject, eventdata, handles, varargin)</a>
+0049 <span class="comment">% This function has no output args, see OutputFcn.</span>
+0050 <span class="comment">% hObject    handle to figure</span>
+0051 <span class="comment">% eventdata  reserved - to be defined in a future version of MATLAB</span>
+0052 <span class="comment">% handles    structure with handles and user data (see GUIDATA)</span>
+0053 <span class="comment">% varargin   command line arguments to ndsdpGui (see VARARGIN)</span>
+0054 
+0055 <span class="comment">% Choose default command line output for ndsdpGui</span>
+0056 handles.output = hObject;
+0057 
+0058 <a href="initialize_globals.html" class="code" title="">initialize_globals</a>
+0059 handles.polarizationString = <span class="string">'TM'</span>;
+0060 handles.x0 = 0;
+0061 handles.y0 = -1;
+0062 handles.maxX = 3;
+0063 handles.maxY = 3;
+0064 handles.minX = -3;
+0065 handles.minY = -3;
+0066 handles.zoomFact = 1.5;
+0067 axes(handles.axes)
+0068 axis([handles.minX, handles.maxX, handles.minY,handles.maxY])
+0069 line([handles.minX, handles.maxX], [0,0])
+0070 hold on
+0071 plot(handles.x0, handles.y0, <span class="string">'ko'</span>)
+0072 plot(handles.x0, handles.y0, <span class="string">'k.'</span>)
+0073 hold off
+0074 h = xlabel(<span class="string">'$x/\lambda$'</span>);
+0075 set(h, <span class="string">'interpreter'</span>, <span class="string">'latex'</span>);
+0076 h = ylabel(<span class="string">'$y/\lambda$'</span>);
+0077 set(h, <span class="string">'interpreter'</span>, <span class="string">'latex'</span>);
+0078 set(handles.animate, <span class="string">'enable'</span>, <span class="string">'off'</span>)
+0079 set(handles.calculating, <span class="string">'visible'</span>, <span class="string">'off'</span>);
+0080 set(handles.permLower, <span class="string">'min'</span>, 1)
+0081 set(handles.permUpper, <span class="string">'min'</span>, 1)
+0082 set(handles.permLower, <span class="string">'max'</span>, 10)
+0083 set(handles.permUpper, <span class="string">'max'</span>, 10)
+0084 lowerInitial = 1;
+0085 upperInitial = 3;
+0086 set(handles.permLower, <span class="string">'value'</span>, lowerInitial)
+0087 set(handles.permUpper, <span class="string">'value'</span>, upperInitial)
+0088 handles.permLowerVal = lowerInitial;
+0089 handles.permUpperVal = upperInitial;
+0090 set(handles.permLowerText, <span class="string">'string'</span>, [<span class="string">'For y&lt;0: '</span> num2str(lowerInitial)])
+0091 set(handles.permUpperText, <span class="string">'string'</span>, [<span class="string">'For y&gt;0: '</span> num2str(upperInitial)])
+0092 iptPointerManager(handles.figure1)
+0093 enterFcn = @(hFigure, currentPoint)<span class="keyword">...</span>
+0094              set(hFigure, <span class="string">'Pointer'</span>, <span class="string">'crosshair'</span>);
+0095 iptSetPointerBehavior(handles.axes, enterFcn);
+0096 <span class="comment">% Update handles structure</span>
+0097 guidata(hObject, handles);
+0098 
+0099 <span class="comment">% UIWAIT makes ndsdpGui wait for user response (see UIRESUME)</span>
+0100 <span class="comment">% uiwait(handles.figure1);</span>
+0101 
+0102 
+0103 <span class="comment">% --- Outputs from this function are returned to the command line.</span>
+0104 <a name="_sub2" href="#_subfunctions" class="code">function varargout = ndsdpGui_OutputFcn(hObject, eventdata, handles)</a>
+0105 <span class="comment">% varargout  cell array for returning output args (see VARARGOUT);</span>
+0106 <span class="comment">% hObject    handle to figure</span>
+0107 <span class="comment">% eventdata  reserved - to be defined in a future version of MATLAB</span>
+0108 <span class="comment">% handles    structure with handles and user data (see GUIDATA)</span>
+0109 
+0110 <span class="comment">% Get default command line output from handles structure</span>
+0111 varargout{1} = handles.output;
+0112 
+0113 
+0114 <span class="comment">% --- Executes on button press in zoomIn.</span>
+0115 <a name="_sub3" href="#_subfunctions" class="code">function zoomIn_Callback(hObject, eventdata, handles)</a>
+0116 <span class="comment">% hObject    handle to zoomIn (see GCBO)</span>
+0117 <span class="comment">% eventdata  reserved - to be defined in a future version of MATLAB</span>
+0118 <span class="comment">% handles    structure with handles and user data (see GUIDATA)</span>
+0119 handles.minX = handles.minX/handles.zoomFact;
+0120 handles.maxX = handles.maxX/handles.zoomFact;
+0121 handles.minY = handles.minY/handles.zoomFact;
+0122 handles.maxY = handles.maxY/handles.zoomFact;
+0123 <a href="#_sub17" class="code" title="subfunction calc_Callback(hObject, eventdata, handles)">calc_Callback</a>(hObject, eventdata, handles);
+0124 
+0125 
+0126 <span class="comment">% --- Executes on button press in zoomOut.</span>
+0127 <a name="_sub4" href="#_subfunctions" class="code">function zoomOut_Callback(hObject, eventdata, handles)</a>
+0128 <span class="comment">% hObject    handle to zoomOut (see GCBO)</span>
+0129 <span class="comment">% eventdata  reserved - to be defined in a future version of MATLAB</span>
+0130 <span class="comment">% handles    structure with handles and user data (see GUIDATA)</span>
+0131 handles.minX = handles.minX*handles.zoomFact;
+0132 handles.maxX = handles.maxX*handles.zoomFact;
+0133 handles.minY = handles.minY*handles.zoomFact;
+0134 handles.maxY = handles.maxY*handles.zoomFact;
+0135 <a href="#_sub17" class="code" title="subfunction calc_Callback(hObject, eventdata, handles)">calc_Callback</a>(hObject, eventdata, handles);
+0136 
+0137 
+0138 <span class="comment">% --- Executes on button press in animate.</span>
+0139 <a name="_sub5" href="#_subfunctions" class="code">function animate_Callback(hObject, eventdata, handles)</a>
+0140 <span class="comment">% hObject    handle to animate (see GCBO)</span>
+0141 <span class="comment">% eventdata  reserved - to be defined in a future version of MATLAB</span>
+0142 <span class="comment">% handles    structure with handles and user data (see GUIDATA)</span>
+0143 handles.doAnimate = true;
+0144 guidata(hObject, handles);
+0145 <a href="#_sub18" class="code" title="subfunction update_axes(hObject, handles)">update_axes</a>(hObject, handles)
+0146 <span class="comment">% --- Executes on slider movement.</span>
+0147 <a name="_sub6" href="#_subfunctions" class="code">function permLower_Callback(hObject, eventdata, handles)</a>
+0148 <span class="comment">% hObject    handle to permLower (see GCBO)</span>
+0149 <span class="comment">% eventdata  reserved - to be defined in a future version of MATLAB</span>
+0150 <span class="comment">% handles    structure with handles and user data (see GUIDATA)</span>
+0151 
+0152 <span class="comment">% Hints: get(hObject,'Value') returns position of slider</span>
+0153 <span class="comment">%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider</span>
+0154 set(handles.permLowerText, <span class="string">'string'</span>, [<span class="string">'For y&lt;0: '</span> num2str(get(hObject, <span class="string">'value'</span>),2)])
+0155 handles.permLowerVal = get(hObject, <span class="string">'value'</span>);
+0156 set(handles.calc, <span class="string">'enable'</span>, <span class="string">'on'</span>)
+0157 guidata(hObject, handles)
+0158 
+0159 
+0160 <span class="comment">% --- Executes during object creation, after setting all properties.</span>
+0161 <a name="_sub7" href="#_subfunctions" class="code">function permLower_CreateFcn(hObject, eventdata, handles)</a>
+0162 <span class="comment">% hObject    handle to permLower (see GCBO)</span>
+0163 <span class="comment">% eventdata  reserved - to be defined in a future version of MATLAB</span>
+0164 <span class="comment">% handles    empty - handles not created until after all CreateFcns called</span>
+0165 
+0166 <span class="comment">% Hint: slider controls usually have a light gray background.</span>
+0167 <span class="keyword">if</span> isequal(get(hObject,<span class="string">'BackgroundColor'</span>), get(0,<span class="string">'defaultUicontrolBackgroundColor'</span>))
+0168     set(hObject,<span class="string">'BackgroundColor'</span>,[.9 .9 .9]);
+0169 <span class="keyword">end</span>
+0170 
+0171 
+0172 <span class="comment">% --- Executes on slider movement.</span>
+0173 <a name="_sub8" href="#_subfunctions" class="code">function permUpper_Callback(hObject, eventdata, handles)</a>
+0174 <span class="comment">% hObject    handle to permUpper (see GCBO)</span>
+0175 <span class="comment">% eventdata  reserved - to be defined in a future version of MATLAB</span>
+0176 <span class="comment">% handles    structure with handles and user data (see GUIDATA)</span>
+0177 
+0178 <span class="comment">% Hints: get(hObject,'Value') returns position of slider</span>
+0179 <span class="comment">%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider</span>
+0180 set(handles.permUpperText, <span class="string">'string'</span>, [<span class="string">'For y&gt;0: '</span> num2str(get(hObject, <span class="string">'value'</span>),2)])
+0181 handles.permUpperVal = get(hObject, <span class="string">'value'</span>);
+0182 set(handles.calc, <span class="string">'enable'</span>, <span class="string">'on'</span>)
+0183 guidata(hObject, handles)
+0184 
+0185 <span class="comment">% --- Executes during object creation, after setting all properties.</span>
+0186 <a name="_sub9" href="#_subfunctions" class="code">function permUpper_CreateFcn(hObject, eventdata, handles)</a>
+0187 <span class="comment">% hObject    handle to permUpper (see GCBO)</span>
+0188 <span class="comment">% eventdata  reserved - to be defined in a future version of MATLAB</span>
+0189 <span class="comment">% handles    empty - handles not created until after all CreateFcns called</span>
+0190 
+0191 <span class="comment">% Hint: slider controls usually have a light gray background.</span>
+0192 <span class="keyword">if</span> isequal(get(hObject,<span class="string">'BackgroundColor'</span>), get(0,<span class="string">'defaultUicontrolBackgroundColor'</span>))
+0193     set(hObject,<span class="string">'BackgroundColor'</span>,[.9 .9 .9]);
+0194 <span class="keyword">end</span>
+0195 
+0196 
+0197 <span class="comment">% --- Executes on selection change in component.</span>
+0198 <a name="_sub10" href="#_subfunctions" class="code">function component_Callback(hObject, eventdata, handles)</a>
+0199 <span class="comment">% hObject    handle to component (see GCBO)</span>
+0200 <span class="comment">% eventdata  reserved - to be defined in a future version of MATLAB</span>
+0201 <span class="comment">% handles    structure with handles and user data (see GUIDATA)</span>
+0202 
+0203 <span class="comment">% Hints: contents = get(hObject,'String') returns component contents as cell array</span>
+0204 <span class="comment">%        contents{get(hObject,'Value')} returns selected item from component</span>
+0205 <a href="#_sub17" class="code" title="subfunction calc_Callback(hObject, eventdata, handles)">calc_Callback</a>(hObject, eventdata, handles);
+0206 
+0207 
+0208 <span class="comment">% --- Executes during object creation, after setting all properties.</span>
+0209 <a name="_sub11" href="#_subfunctions" class="code">function component_CreateFcn(hObject, eventdata, handles)</a>
+0210 <span class="comment">% hObject    handle to component (see GCBO)</span>
+0211 <span class="comment">% eventdata  reserved - to be defined in a future version of MATLAB</span>
+0212 <span class="comment">% handles    empty - handles not created until after all CreateFcns called</span>
+0213 
+0214 <span class="comment">% Hint: popupmenu controls usually have a white background on Windows.</span>
+0215 <span class="comment">%       See ISPC and COMPUTER.</span>
+0216 <span class="keyword">if</span> ispc &amp;&amp; isequal(get(hObject,<span class="string">'BackgroundColor'</span>), get(0,<span class="string">'defaultUicontrolBackgroundColor'</span>))
+0217     set(hObject,<span class="string">'BackgroundColor'</span>,<span class="string">'white'</span>);
+0218 <span class="keyword">end</span>
+0219 
+0220 
+0221 <span class="comment">% --- Executes on selection change in complexPart.</span>
+0222 <a name="_sub12" href="#_subfunctions" class="code">function complexPart_Callback(hObject, eventdata, handles)</a>
+0223 <span class="comment">% hObject    handle to complexPart (see GCBO)</span>
+0224 <span class="comment">% eventdata  reserved - to be defined in a future version of MATLAB</span>
+0225 <span class="comment">% handles    structure with handles and user data (see GUIDATA)</span>
+0226 
+0227 <span class="comment">% Hints: contents = get(hObject,'String') returns complexPart contents as cell array</span>
+0228 <span class="comment">%        contents{get(hObject,'Value')} returns selected item from complexPart</span>
+0229 <span class="keyword">if</span> strcmpi(get(handles.calc, <span class="string">'enable'</span>), <span class="string">'off'</span>)
+0230     <a href="#_sub18" class="code" title="subfunction update_axes(hObject, handles)">update_axes</a>(hObject, handles);
+0231 <span class="keyword">end</span>
+0232 
+0233 <span class="comment">% --- Executes during object creation, after setting all properties.</span>
+0234 <a name="_sub13" href="#_subfunctions" class="code">function complexPart_CreateFcn(hObject, eventdata, handles)</a>
+0235 <span class="comment">% hObject    handle to complexPart (see GCBO)</span>
+0236 <span class="comment">% eventdata  reserved - to be defined in a future version of MATLAB</span>
+0237 <span class="comment">% handles    empty - handles not created until after all CreateFcns called</span>
+0238 
+0239 <span class="comment">% Hint: popupmenu controls usually have a white background on Windows.</span>
+0240 <span class="comment">%       See ISPC and COMPUTER.</span>
+0241 <span class="keyword">if</span> ispc &amp;&amp; isequal(get(hObject,<span class="string">'BackgroundColor'</span>), get(0,<span class="string">'defaultUicontrolBackgroundColor'</span>))
+0242     set(hObject,<span class="string">'BackgroundColor'</span>,<span class="string">'white'</span>);
+0243 <span class="keyword">end</span>
+0244 
+0245 
+0246 <span class="comment">% --- Executes when selected object is changed in sourceType.</span>
+0247 <a name="_sub14" href="#_subfunctions" class="code">function sourceType_SelectionChangeFcn(hObject, eventdata, handles)</a>
+0248 <span class="comment">% hObject    handle to the selected object in sourceType</span>
+0249 <span class="comment">% eventdata  structure with the following fields (see UIBUTTONGROUP)</span>
+0250 <span class="comment">%    EventName: string 'SelectionChanged' (read only)</span>
+0251 <span class="comment">%    OldValue: handle of the previously selected object or empty if none was selected</span>
+0252 <span class="comment">%    NewValue: handle of the currently selected object</span>
+0253 <span class="comment">% handles    structure with handles and user data (see GUIDATA)</span>
+0254 <span class="keyword">switch</span> get(eventdata.NewValue,<span class="string">'Tag'</span>) <span class="comment">% Get Tag of selected object.</span>
+0255     <span class="keyword">case</span> <span class="string">'els'</span>
+0256         set(handles.els, <span class="string">'value'</span>, <span class="string">'max'</span>)
+0257         set(handles.mls, <span class="string">'value'</span>, <span class="string">'min'</span>)
+0258     <span class="keyword">case</span> <span class="string">'mls'</span>
+0259         set(handles.mls, <span class="string">'value'</span>, <span class="string">'max'</span>)
+0260         set(handles.els, <span class="string">'value'</span>, <span class="string">'min'</span>)
+0261 <span class="keyword">end</span>
+0262 
+0263 
+0264 <span class="comment">% --- Executes on button press in els.</span>
+0265 <a name="_sub15" href="#_subfunctions" class="code">function els_Callback(hObject, eventdata, handles)</a>
+0266 <span class="comment">% hObject    handle to els (see GCBO)</span>
+0267 <span class="comment">% eventdata  reserved - to be defined in a future version of MATLAB</span>
+0268 <span class="comment">% handles    structure with handles and user data (see GUIDATA)</span>
+0269 
+0270 <span class="comment">% Hint: get(hObject,'Value') returns toggle state of els</span>
+0271 set(hObject, <span class="string">'value'</span>, get(hObject,<span class="string">'max'</span>))
+0272 <span class="keyword">if</span> strcmpi(handles.polarizationString, <span class="string">'TE'</span>) <span class="comment">% state has changed</span>
+0273     comp = get(handles.component, <span class="string">'value'</span>);
+0274     <span class="keyword">switch</span> comp <span class="comment">% switch component to calculate</span>
+0275         <span class="keyword">case</span> {1,2,3}
+0276             newComp = comp+3;
+0277         <span class="keyword">otherwise</span>
+0278             newComp = comp-3;
+0279     <span class="keyword">end</span>
+0280     set(handles.component, <span class="string">'value'</span>, newComp)
+0281     handles.polarizationString=<span class="string">'TM'</span>;
+0282     set(handles.calc, <span class="string">'enable'</span>, <span class="string">'on'</span>)
+0283 <span class="keyword">end</span>
+0284 guidata(hObject, handles);
+0285 
+0286 
+0287 <span class="comment">% --- Executes on button press in mls.</span>
+0288 <a name="_sub16" href="#_subfunctions" class="code">function mls_Callback(hObject, eventdata, handles)</a>
+0289 <span class="comment">% hObject    handle to mls (see GCBO)</span>
+0290 <span class="comment">% eventdata  reserved - to be defined in a future version of MATLAB</span>
+0291 <span class="comment">% handles    structure with handles and user data (see GUIDATA)</span>
+0292 
+0293 <span class="comment">% Hint: get(hObject,'Value') returns toggle state of mls</span>
+0294 set(hObject, <span class="string">'value'</span>, get(hObject,<span class="string">'max'</span>))
+0295 <span class="keyword">if</span> strcmpi(handles.polarizationString, <span class="string">'TM'</span>) <span class="comment">% state has changed</span>
+0296     comp = get(handles.component, <span class="string">'value'</span>);
+0297     <span class="keyword">switch</span> comp <span class="comment">% switch component to calculate</span>
+0298         <span class="keyword">case</span> {1,2,3}
+0299             newComp = comp+3;
+0300         <span class="keyword">otherwise</span>
+0301             newComp = comp-3;
+0302     <span class="keyword">end</span>
+0303     set(handles.component, <span class="string">'value'</span>, newComp)
+0304     handles.polarizationString=<span class="string">'TE'</span>;
+0305     set(handles.calc, <span class="string">'enable'</span>, <span class="string">'on'</span>)
+0306 <span class="keyword">end</span>
+0307 guidata(hObject, handles);
+0308 
+0309 <span class="comment">% --- Executes on button press in calc.</span>
+0310 <a name="_sub17" href="#_subfunctions" class="code">function calc_Callback(hObject, eventdata, handles)</a>
+0311 <span class="comment">% hObject    handle to calc (see GCBO)</span>
+0312 <span class="comment">% eventdata  reserved - to be defined in a future version of MATLAB</span>
+0313 <span class="comment">% handles    structure with handles and user data (see GUIDATA)</span>
+0314 Source.x = handles.x0;
+0315 Source.y = handles.y0;
+0316 lambda = 1;
+0317 Source.lambda = lambda;
+0318 Source.polarizationString = handles.polarizationString;
+0319 shortLambda = lambda/sqrt(max(handles.permLowerVal, handles.permUpperVal));
+0320 pointsPerShortLambda = 7;
+0321 nPointsX = (handles.maxX-handles.minX)/shortLambda*pointsPerShortLambda;
+0322 nPointsY = (handles.maxY-handles.minY)/shortLambda*pointsPerShortLambda;
+0323 nPointsX = max(nPointsX, 40);
+0324 nPointsY = max(nPointsY, 40);
+0325 x = linspace(handles.minX, handles.maxX, nPointsX);
+0326 y = linspace(handles.minY, handles.maxY, nPointsY);
+0327 [EvalAt.x, EvalAt.y] = meshgrid(x,y);
+0328 Options.useAdaptive = false; <span class="comment">% Change the number of points adaptively.</span>
+0329 Options.nPoints = 20; <span class="comment">% Number of integration points (should be even).</span>
+0330 componentStringArray = get(handles.component, <span class="string">'string'</span>);
+0331 componentString = componentStringArray{get(handles.component, <span class="string">'value'</span>)};
+0332 set(handles.calculating, <span class="string">'visible'</span>, <span class="string">'on'</span>);
+0333 prevPointer = get(handles.figure1, <span class="string">'pointer'</span>);
+0334 set(handles.figure1, <span class="string">'pointer'</span>, <span class="string">'watch'</span>)
+0335 pause(0.01);
+0336 field = <a href="ndsdp.html" class="code" title="function [field, nPoints] = ndsdp(EvalAt, Source, permittivityLowerRegion,permittivityUpperRegion, componentString, Options)">ndsdp</a>(EvalAt, Source, handles.permLowerVal, handles.permUpperVal, componentString, Options);
+0337 set(handles.calculating, <span class="string">'visible'</span>, <span class="string">'off'</span>);
+0338 set(handles.figure1, <span class="string">'pointer'</span>, prevPointer)
+0339 handles.field = field;
+0340 handles.doAnimate = false;
+0341 handles.imResizeFact = 2;
+0342 field = imresize(field, handles.imResizeFact, <span class="string">'bilinear'</span>);
+0343 handles.resizedField = field;
+0344 handles.x = x;
+0345 handles.y = y;
+0346 set(handles.calc, <span class="string">'enable'</span>, <span class="string">'off'</span>)
+0347 guidata(hObject, handles);
+0348 <a href="#_sub18" class="code" title="subfunction update_axes(hObject, handles)">update_axes</a>(hObject, handles);
+0349 
+0350 <a name="_sub18" href="#_subfunctions" class="code">function update_axes(hObject, handles)</a>
+0351 axes(handles.axes)
+0352 complexPartStringArray = get(handles.complexPart, <span class="string">'string'</span>);
+0353 complexPartString = complexPartStringArray{get(handles.complexPart, <span class="string">'value'</span>)};
+0354 field = handles.resizedField;
+0355 x = handles.x;
+0356 y = handles.y;
+0357 <span class="keyword">switch</span> lower(complexPartString)
+0358     <span class="keyword">case</span> <span class="string">'real'</span>
+0359         valToShow = real(field);
+0360     <span class="keyword">case</span> <span class="string">'imag'</span>
+0361         valToShow = imag(field);
+0362     <span class="keyword">case</span> <span class="string">'abs'</span>
+0363         valToShow = imresize(abs(handles.field), handles.imResizeFact, <span class="string">'bilinear'</span>);
+0364     <span class="keyword">case</span> <span class="string">'angle'</span>
+0365         valToShow = angle(field);
+0366 <span class="keyword">end</span>
+0367 <span class="keyword">if</span> handles.doAnimate
+0368     nFrames = 80;
+0369     t = linspace(0, 4*pi, nFrames);
+0370 <span class="keyword">else</span>
+0371     nFrames = 1;
+0372 <span class="keyword">end</span>
+0373 M = max(abs(field(:)));
+0374 <span class="keyword">for</span> iT = 1:nFrames
+0375     <span class="keyword">if</span> handles.doAnimate
+0376         valToShow = real(field*exp(j*t(iT)));
+0377         valToShow(1,1) = M;
+0378         valToShow(<span class="keyword">end</span>,end) = -M;
+0379     <span class="keyword">end</span>
+0380     imagesc(x, y, valToShow);
+0381     set(gca, <span class="string">'ydir'</span>, <span class="string">'normal'</span>);
+0382     axis image
+0383     line([min(x), max(x)], [0 0])
+0384     hold on
+0385     plot(handles.x0, handles.y0, <span class="string">'wo'</span>)
+0386     plot(handles.x0, handles.y0, <span class="string">'w.'</span>)
+0387     hold off
+0388     drawnow
+0389 <span class="keyword">end</span>
+0390 handles.doAnimate = false;
+0391 guidata(hObject, handles);
+0392 set(handles.animate, <span class="string">'enable'</span>, <span class="string">'on'</span>)
+0393 
+0394 <span class="comment">% --- If Enable == 'on', executes on mouse press in 5 pixel border.</span>
+0395 <span class="comment">% --- Otherwise, executes on mouse press in 5 pixel border or over els.</span>
+0396 <a name="_sub19" href="#_subfunctions" class="code">function els_ButtonDownFcn(hObject, eventdata, handles)</a>
+0397 <span class="comment">% hObject    handle to els (see GCBO)</span>
+0398 <span class="comment">% eventdata  reserved - to be defined in a future version of MATLAB</span>
+0399 <span class="comment">% handles    structure with handles and user data (see GUIDATA)</span>
+0400 
+0401 <span class="comment">% --- Executes on mouse press over figure background, over a disabled or</span>
+0402 <span class="comment">% --- inactive control, or over an axes background.</span>
+0403 <a name="_sub20" href="#_subfunctions" class="code">function figure1_WindowButtonDownFcn(hObject, eventdata, handles)</a>
+0404 <span class="comment">% hObject    handle to figure1 (see GCBO)</span>
+0405 <span class="comment">% eventdata  reserved - to be defined in a future version of MATLAB</span>
+0406 <span class="comment">% handles    structure with handles and user data (see GUIDATA)</span>
+0407 <span class="keyword">if</span> strcmpi(get(hObject, <span class="string">'pointer'</span>), <span class="string">'crosshair'</span>)
+0408     mousePosition = get(handles.axes, <span class="string">'CurrentPoint'</span>);
+0409     handles.x0 = mousePosition(1,1);
+0410     handles.y0 = mousePosition(1,2);
+0411     guidata(hObject, handles);
+0412     <a href="#_sub17" class="code" title="subfunction calc_Callback(hObject, eventdata, handles)">calc_Callback</a>(hObject, eventdata, handles);
+0413 <span class="keyword">end</span>
+0414 
+0415</pre></div>
+<hr><address>Generated on Tue 05-May-2015 18:03:31 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

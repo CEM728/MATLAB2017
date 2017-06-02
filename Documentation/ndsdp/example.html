@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of example</title>
+  <meta name="keywords" content="example">
+  <meta name="description" content="% Calculation of the field of a line-source in front of dielectric half-space.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">ndsdp</a> &gt; example.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ndsdp&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>example
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>% Calculation of the field of a line-source in front of dielectric half-space.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">% Calculation of the field of a line-source in front of dielectric half-space.
+ This example shows how to use the ND-SDP method.
+%</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="initialize_globals.html" class="code" title="">initialize_globals</a>	</li><li><a href="ndsdp.html" class="code" title="function [field, nPoints] = ndsdp(EvalAt, Source, permittivityLowerRegion,permittivityUpperRegion, componentString, Options)">ndsdp</a>	[field, nPoints] = ndsdp(EvalAt, Source, permittivityLowerRegion, permittivityUpperRegion, componentString, Options)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%% Calculation of the field of a line-source in front of dielectric half-space.</span>
+0002 <span class="comment">% This example shows how to use the ND-SDP method.</span>
+0003 <span class="comment">%%</span>
+0004 
+0005 <span class="comment">%% Set-up some global variables</span>
+0006 clear
+0007 <a href="initialize_globals.html" class="code" title="">initialize_globals</a>
+0008 
+0009 <span class="comment">%% Set-up parameters</span>
+0010 permittivityLowerRegion = 1; <span class="comment">% Relative permittivity of the y &lt; 0 region.</span>
+0011 permittivityUpperRegion = 3; <span class="comment">% Relative permittivity of the y &gt; 0 region.</span>
+0012 componentString = <span class="string">'Ez'</span>; <span class="comment">% Cartesian component to calculate.</span>
+0013 
+0014 <span class="comment">%% Source parameters</span>
+0015 lambda = 1; <span class="comment">% free-space wavelength [m]</span>
+0016 Source.lambda = lambda;         
+0017 Source.polarizationString = <span class="string">'TM'</span>; <span class="comment">% An electric line source, use 'TE' for a magnetic one.</span>
+0018 Source.x = 0; Source.y = -lambda; <span class="comment">% Source coordinates</span>
+0019 
+0020 
+0021 <span class="comment">%% Grid points at which the field is to be evaluated</span>
+0022 nX = 100; nY = nX; 
+0023 r = lambda*3;
+0024 x = linspace(-r, r, nX);
+0025 y = linspace(-r, r, nY);
+0026 [EvalAt.x, EvalAt.y] = meshgrid(x,y);
+0027 
+0028 <span class="comment">%% Set options</span>
+0029 Options.quasistaticRule = <span class="string">'discretization'</span>; <span class="comment">% Use discretization method for quasi-static case.</span>
+0030                                             <span class="comment">% Default value is 'Legendre'.</span>
+0031 Options.useAdaptive = false; <span class="comment">% Change the number of points adaptively.</span>
+0032 
+0033 <span class="comment">% if options.useAdaptive == false, the following option must be set:</span>
+0034 Options.nPoints = 20; <span class="comment">% Number of integration points (should be even).</span>
+0035 
+0036 <span class="comment">% if options.useAdaptive == true, the following options must be set:</span>
+0037 Options.tol = 1e-3; <span class="comment">% Maximum relative error for adaptive scheme.</span>
+0038 Options.maxPoints = 2^10; <span class="comment">% Max. number of integration points in the adaptive scheme.</span>
+0039 
+0040 <span class="comment">%% Calculate field</span>
+0041 tic
+0042 field = <a href="ndsdp.html" class="code" title="function [field, nPoints] = ndsdp(EvalAt, Source, permittivityLowerRegion,permittivityUpperRegion, componentString, Options)">ndsdp</a>(EvalAt, Source, permittivityLowerRegion, permittivityUpperRegion, componentString, Options);
+0043 toc
+0044 <span class="comment">%% Show the result</span>
+0045 clf
+0046 imagesc(x/lambda, y/lambda, real(field));
+0047 set(gca, <span class="string">'ydir'</span>, <span class="string">'normal'</span>);
+0048 axis image
+0049 colorbar
+0050 line([min(x/lambda), max(x/lambda)], [0 0])</pre></div>
+<hr><address>Generated on Tue 05-May-2015 18:03:31 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

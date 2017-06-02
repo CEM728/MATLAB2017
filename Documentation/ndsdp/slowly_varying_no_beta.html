@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of slowly_varying_no_beta</title>
+  <meta name="keywords" content="slowly_varying_no_beta">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">ndsdp</a> &gt; slowly_varying_no_beta.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ndsdp&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>slowly_varying_no_beta
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function field = slowly_varying_no_beta(oPath, vX, vY, x_s, k0, Er_d, Er_u, sComp, bMSource) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="comp_num.html" class="code" title="function comp = comp_num(sComp)">comp_num</a>	</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="integrand_vect.html" class="code" title="function field = integrand_vect(oPath, vX, vY, x_s, y_s, k0, Er_d, Er_u, sComp, bMSource, oIm)">integrand_vect</a>	</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function out = cross_withZ(x, y, comp)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function field = slowly_varying_no_beta(oPath, vX, vY, x_s, k0, Er_d, Er_u, sComp, bMSource)</a>
+0002 <span class="keyword">global</span> ETA
+0003 mKx = oPath.kx;
+0004 mKy_inc = oPath.ky_d;
+0005 mKy_t = oPath.ky_u;
+0006 
+0007 vX = vX(:);
+0008 vY = vY(:);
+0009 nXY = length(vX);
+0010 [rows, cols] = size(mKx);
+0011 nKx = cols;
+0012 comp = <a href="comp_num.html" class="code" title="function comp = comp_num(sComp)">comp_num</a>(sComp);
+0013 k_u = k0*sqrt(Er_u);
+0014 k_d = k0*sqrt(Er_d);
+0015 ETA_d = ETA/sqrt(Er_d);
+0016 ETA_u = ETA/sqrt(Er_u);
+0017 
+0018 mX = repmat(vX, 1, nKx);
+0019 mSx = sign(mX-x_s);
+0020 
+0021 <span class="comment">% return regularized integrand for calc_residue if on pole</span>
+0022 k_pole = sqrt((Er_d*Er_u)/(Er_d+Er_u))*k0;
+0023 bmOnPoleSheet = sign(real(mKy_t).*real(mKy_inc))&lt;0;
+0024 bmOnPole = bMSource &amp; (mKx == k_pole) &amp; bmOnPoleSheet;
+0025 R_para = zeros(size(mKx));
+0026 T_para = R_para;
+0027 <span class="keyword">if</span> any(bmOnPole)
+0028     R_para(bmOnPole) = (Er_u*mKy_inc(bmOnPole)-Er_d*mKy_t(bmOnPole)).^2./(2*k_pole)./(Er_d^2-Er_u^2);
+0029     T_para(bmOnPole) = 2*Er_u*mKy_inc(bmOnPole).*(Er_u*mKy_inc(bmOnPole)-Er_d*mKy_t(bmOnPole))./(2*k_pole)./(Er_d^2-Er_u^2);
+0030 <span class="keyword">end</span>
+0031 <span class="keyword">if</span> any(~bmOnPole)
+0032     T_para(~bmOnPole) = 2*Er_u*mKy_inc(~bmOnPole)./(Er_u*mKy_inc(~bmOnPole)+Er_d*mKy_t(~bmOnPole));
+0033     R_para(~bmOnPole) = T_para(~bmOnPole)-1;
+0034 <span class="keyword">end</span>
+0035 T_perp = 2*mKy_inc./(mKy_inc+mKy_t);
+0036 R_perp = T_perp-1;
+0037 
+0038 mK_inc_x = mSx.*mKx;
+0039 mK_inc_y = mKy_inc;
+0040 
+0041 mK_r_x = mK_inc_x;
+0042 mK_r_y = -mK_inc_y;
+0043 mK_t_x = mK_inc_x;
+0044 mK_t_y = mKy_t;
+0045 <span class="keyword">if</span> ~bMSource
+0046     aE0 = -1/4/pi/k_d*ETA_d*k_d^2./mKy_inc;
+0047     aH0 = zeros(size(mKx));
+0048 <span class="keyword">else</span>
+0049     aH0 = -1/4/pi/k_d/ETA_d*k_d^2./mKy_inc;
+0050     aE0 = zeros(size(mKx));
+0051 <span class="keyword">end</span>
+0052 
+0053 E_perp_i = aE0; <span class="comment">%dot product</span>
+0054 H_perp_i = aH0;
+0055 
+0056 E_perp_r = R_perp.*E_perp_i;
+0057 E_perp_t = T_perp.*E_perp_i;
+0058 H_perp_r = R_para.*H_perp_i;
+0059 H_perp_t = T_para.*H_perp_i;
+0060 
+0061 bRef = vY&lt;=0;
+0062 mRef = repmat(bRef, 1, nKx);
+0063 
+0064 ft1 = zeros(nXY, nKx);
+0065 fr1 = ft1;
+0066 field = ft1;
+0067 cross_t = <a href="#_sub1" class="code" title="subfunction out = cross_withZ(x, y, comp)">cross_withZ</a>(mK_t_x, mK_t_y, comp)/k_u;
+0068 cross_r = <a href="#_sub1" class="code" title="subfunction out = cross_withZ(x, y, comp)">cross_withZ</a>(mK_r_x, mK_r_y, comp)/k_d;
+0069 
+0070 <span class="keyword">if</span> lower(sComp(1)) == <span class="string">'e'</span>
+0071     ft1(~mRef) = (E_perp_t(~mRef) - <span class="keyword">...</span>
+0072         ETA_u*H_perp_t(~mRef).*cross_t(~mRef));
+0073 <span class="keyword">else</span>
+0074     ft1(~mRef) = (H_perp_t(~mRef) + <span class="keyword">...</span>
+0075         1/ETA_u*E_perp_t(~mRef).*cross_t(~mRef));
+0076 <span class="keyword">end</span>
+0077 field(~mRef) = ft1(~mRef);
+0078 
+0079 <span class="keyword">if</span> lower(sComp(1)) == <span class="string">'e'</span>
+0080     fr1(mRef) = (E_perp_r(mRef) - <span class="keyword">...</span>
+0081         ETA_d*H_perp_r(mRef).*cross_r(mRef));
+0082 <span class="keyword">else</span>
+0083     fr1(mRef) = (H_perp_r(mRef) + <span class="keyword">...</span>
+0084         1/ETA_d*E_perp_r(mRef).*cross_r(mRef));
+0085 <span class="keyword">end</span>
+0086 
+0087 field(mRef) = fr1(mRef);
+0088 
+0089 field = reshape(field, rows, cols);
+0090     <a name="_sub1" href="#_subfunctions" class="code">function out = cross_withZ(x, y, comp)</a>
+0091         <span class="keyword">switch</span> comp
+0092             <span class="keyword">case</span> 1
+0093                 out = y;
+0094             <span class="keyword">case</span> 2
+0095                 out = -x;
+0096             <span class="keyword">case</span> 3
+0097                 out = zeros(size(x));
+0098         <span class="keyword">end</span>
+0099     <span class="keyword">end</span>
+0100 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 05-May-2015 18:03:31 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

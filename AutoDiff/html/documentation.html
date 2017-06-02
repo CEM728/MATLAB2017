@@ -1,0 +1,501 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Automatic Differentiation with the AutoDiff toolbox</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-05-09"><meta name="DC.source" content="documentation.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Automatic Differentiation with the <b>AutoDiff</b> toolbox</h1><!--introduction--><p>by <a href="http://www3.mathematik.tu-darmstadt.de/hp/geometrie-und-approximation/reif-ulrich/home.html">Ulrich Reif</a></p><p>Version 2.0 - May 09, 2016</p><p>The <b>AutoDiff toolbox</b> realizes automatic differentiation of functions by means of operator overloading. Without relying on the symbolic toolbox, it provides</p><div><ul><li>Ordinary and partial derivatives of arbitrary order</li><li>Differential operators, like Laplacian and curl</li><li>Creation of stand-alone functions, as requested for optimization or ODE tools</li><li>Taylor expansions of explicit expressions and solutions of ODEs</li><li>Curvature computation for curves and surfaces</li><li>Resolution of singularities of type "0/0" by l'Hospital's rule</li></ul></div><p>Automatic differentiation is useful whenever derivatives of functional expressions are needed and calculus by hand is too tedious. Finite differences and symbolic computations are alternatives with pros and cons known to anybody working with them.</p><p>The <i>audi</i> class, which is the central part of the toolbox, admits to evaluate derivatives of functions which are defined in the usual way by composing arithmetic operators and elementary functions. During evaluation, derivatives are computed in the background without further user interaction if the input variables are of class <i>audi</i>. In principle, automatic differentiation yields exact results, but of course, accuracy is subject to rounding errors, as for any other numerical computation.</p><p>This is the second version of <b>AutoDiff</b>, which is certainly still not perfect. Error reports and suggestions are welcome.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Initialization and evaluation</a></li><li><a href="#4">Arrays</a></li><li><a href="#5">Taylor expansion of explicit functions and ODEs</a></li><li><a href="#8">Differential operators</a></li><li><a href="#9">Stand-alone functions</a></li><li><a href="#13">Rule of l'Hospital</a></li><li><a href="#14">Matrix computations</a></li><li><a href="#15">Curves and Surfaces</a></li><li><a href="#16">Overloaded operators and functions</a></li><li><a href="#17">Limitations</a></li><li><a href="#18">Release notes</a></li></ul></div><h2>Initialization and evaluation<a name="1"></a></h2><p>When initializing arguments of functions as <i>audi</i> variables, subsequent results of computations do not only contain functions values, as usual, but also derivatives up to some given order <tt>k</tt>.</p><p><b>Univariate case:</b> Let <tt>f</tt> be a function depending on one variable. To evaluate <tt>f</tt> and all its derivatives up to order <tt>k</tt> at some points <tt>v</tt>, stored as a <i>double</i> array, type</p><pre class="language-matlab">&gt;    x = ainit(v,k)
+&gt;    y = f(x)
+</pre><p>Curly braces are used to get the values <tt>yd</tt> of the <tt>d</tt>-th derivative of <tt>f</tt> at the points <tt>v</tt>:</p><pre class="language-matlab">&gt;    yd = y{d}
+</pre><p>The size of the double array <tt>yd</tt> is</p><pre class="language-matlab">&gt;    asize(y) = size(yd) = size(v)
+</pre><pre class="codeinput"><span class="comment">% Example</span>
+x = ainit(1:5,3);      <span class="comment">% initialize audi variable, up to 3rd derivative covered</span>
+y = x.^3;              <span class="comment">% compute function f(x) = x^3</span>
+y{2}                   <span class="comment">% values of 2nd derivative, f''(x) = 6x</span>
+</pre><pre class="codeoutput">
+ans =
+
+     6    12    18    24    30
+
+</pre><p><b>Multivariate case:</b> If <tt>f</tt> depends on <tt>n</tt> variables and shall be evaluated at the some points <tt>v1,...,vn</tt>, stored as <i>double</i> arrays of equal size, type</p><pre>&gt;    [x1,...,xn] = ainit(v1,...,vn,k)
+&gt;    y = f(x1,...,xn)</pre><p>Again, curly braces are used to get the values <tt>yd</tt> of the partial derivative of order <tt>d1,...,dn</tt> at the points <tt>v1,...,vn</tt>:</p><pre class="language-matlab">&gt;    yd = y{d1,<span class="keyword">...</span><span class="comment">,dn}</span>
+</pre><p>The sum <tt>d1+...+dn</tt> must not exceed</p><pre class="language-matlab">&gt;    aord(y) = k
+</pre><p>Curly braces can be replaced by the command <tt>aeval</tt>,</p><pre class="language-matlab">&gt;    y{d1,<span class="keyword">...</span><span class="comment">,dn} = aeval(y,d1,...,dn)</span>
+</pre><p><i>Example:</i> <a href="example1.html">Functions, derivatives, and Newton's method</a></p><p><i>See also:</i> <a href="matlab:doc('ainit')">ainit</a>, <a href="matlab:doc('aeval')">aeval</a>, <a href="matlab:doc('asize')">asize</a>, <a href="matlab:doc('aord')">aord</a></p><h2>Arrays<a name="4"></a></h2><p><i>audi</i> variables can be concatenated to form arrays in the familiar way. Also operations like <tt>repmat</tt> or <tt>transpose</tt> are supported. <i>audi</i> arrays can be multiplied by other arrays of class <i>double</i> or <i>audi</i> in the sense of matrix and elementwise multiplication using the operators <tt>*</tt> and <tt>.*</tt>, respectively.</p><p>Parentheses select subarrays of <i>audi</i> arrays. By contrast, to define the <i>audi</i> array <tt>b</tt> which contains only parts of the data of the given <i>audi</i> array <tt>a</tt>, use</p><pre class="language-matlab">&gt;    b = aget(a,ref)
+</pre><p>where <tt>ref</tt> is a single index or a list of indices addressing parts of the data arrays. Note that <tt>size(b)=size(a)</tt> while <tt>asize(b)&lt;=asize(a)</tt>. Parts of <i>audi</i> data are replaced by</p><pre class="language-matlab">&gt;    a = aset(a,b,ref)
+</pre><p>Evaluation of arrays by curly braces follows special formatting rules, as documented for <tt>aeval</tt>.</p><p><i>Example:</i> <a href="example2.html">Curvature and torsion of a space curve</a></p><p><i>See also:</i> <a href="matlab:doc('aeval')">aeval</a>, <a href="matlab:doc('aget')">aget</a>, <a href="matlab:doc('aset')">aset</a></p><h2>Taylor expansion of explicit functions and ODEs<a name="5"></a></h2><p><b>Explicit case:</b> Let <tt>f</tt> be a scalar function of one variable. To determine the coefficients <tt>p</tt> of the Taylor polynomial of degree <tt>k</tt> at the point <tt>x0</tt>, type</p><pre class="language-matlab">&gt;    x = ainit(x0,k)
+&gt;    p = ataylor(f(x))
+</pre><pre class="codeinput"><span class="comment">% Example</span>
+x = ainit(1,4);
+p = ataylor(log(x))
+</pre><pre class="codeoutput">
+p =
+
+   -0.2500    0.3333   -0.5000    1.0000         0
+
+</pre><p><b>Solution of ODE:</b> Consider the initial value problem</p><pre class="language-matlab">&gt;    y'(x) = f(x,y)
+&gt;    y(x0) = y0
+</pre><p>To obtain the coefficients <tt>p</tt> of the degree <tt>k</tt> Taylor polynomial of the sought function <tt>y</tt> at <tt>x0</tt>, type</p><pre class="language-matlab">&gt;    p = aode(f,x0,y0,k)
+</pre><p>where <tt>f = @(x,y)...</tt> is an anonymous function. For systems of ODEs, the Taylor polynomials <tt>p1,...,pm</tt> of the sought functions <tt>y1,...,ym</tt> can be computed by</p><pre class="language-matlab">&gt;    [p1,<span class="keyword">...</span><span class="comment">,pm] = aode(f,x0,y0,k)</span>
+</pre><p>where <tt>f = @(x,y1,...,ym)[...;...;...]</tt> is an anonymous function returning a column vector with <tt>m</tt> entries.</p><p>It is possible to pass additional parameters to the routine,</p><pre class="language-matlab">&gt;    [p1,<span class="keyword">...</span><span class="comment">,pm] = aode(f,x0,y0,k,c1,c2,...)</span>
+</pre><p><i>Example:</i> <a href="example3.html">The mathematical pendulum</a></p><p><i>See also:</i> <a href="matlab:doc('ataylor')">ataylor</a>, <a href="matlab:doc('aode')">aode</a></p><h2>Differential operators<a name="8"></a></h2><p>Differential operators map <i>audi</i> variables to new <i>audi</i> variables of lower order.</p><p>The general differentiation operator is</p><pre class="language-matlab">&gt;    yd = adiff(y,d1,<span class="keyword">...</span><span class="comment">,dn)</span>
+</pre><p>The order of the <i>audi</i> variable <tt>yd</tt> is</p><pre class="language-matlab">&gt;    aord(yd) = aord(y) - (d1+<span class="keyword">...</span><span class="comment">+dn)</span>
+</pre><p>The <i>audi</i> class also provides various other predefined differential operators:</p><div><ul><li>scalar-valued: <tt>alap</tt> (Laplacian), <tt>adiv</tt> (divergence)</li><li>vector-valued: <tt>agrad</tt> (gradient), <tt>acurl</tt> (curl)</li><li>matrix-valued: <tt>ajac</tt> (Jacobian), <tt>ahess</tt> (Hessian)</li></ul></div><p>There exists a shortcut to evaluate the outcome of any of these operators:</p><pre>&gt;    a*(y,0) = aeval(a*(y),0,...,0)</pre><p><i>Example:</i> <a href="example4.html">Laplacian of the peaks function and its maximum</a></p><p><i>See also:</i> <a href="matlab:doc('acurl')">acurl</a>, <a href="matlab:doc('adiff')">adiff</a>, <a href="matlab:doc('adiv')">adiv</a>, <a href="matlab:doc('agrad')">agrad</a>, <a href="matlab:doc('ahess')">ahess</a>, <a href="matlab:doc('ajac')">ajac</a>, <a href="matlab:doc('alap')">alap</a></p><h2>Stand-alone functions<a name="9"></a></h2><p>Sometimes, it is convenient or even necessary to have available a stand-alone function for evaluating gradients or other differential properties of a given function. In particular, if you want to</p><div><ul><li>pass derivatives to routines like <tt>integral</tt> or <tt>fzero</tt></li><li>enhance the performance of optimization routines like <tt>fmincon</tt> by supplying   gradients or Hessians</li><li>furnish solvers for stiff ODEs like <tt>ode15s</tt> by supplying Jacobians</li></ul></div><p>such functionality is requested. To this end, all differential operators described in the preceding section are able to create function handles from function handles. Using this feature, initialization of <i>audi</i> variables becomes obsolete at the cost of slightly increased computation times.</p><pre class="codeinput"><span class="comment">% Example</span>
+f_uvv = adiff(@peaks,[1 2]);    <span class="comment">% 2nd argument = order of differentiation</span>
+f_uvv(-2:2,zeros(1,5))          <span class="comment">% evaluate partial derivative</span>
+
+L = alap(@peaks,2);             <span class="comment">% 2nd argument = number of variables</span>
+L(-2:2,zeros(1,5))              <span class="comment">% evaluate Laplacian</span>
+</pre><pre class="codeoutput">
+ans =
+
+    8.5168   -5.5811   -0.9051   -8.8779    6.7321
+
+
+ans =
+
+    0.3692   21.2751    2.2073  -18.3910    1.6509
+
+</pre><p>It is important to note that the arguments to the functions <tt>f_uvv</tt> and <tt>L</tt> are standard double arrays, and not <i>audi</i> variables.</p><p>When solving a stiff ODE <tt>y' = f(t,y),</tt> the Jacobian <tt>J</tt> of <tt>f</tt> with respect to <tt>y</tt> may be supplied to solvers like <tt>ode15s</tt> to enhance performance. The according function handle can be created as follows:</p><pre class="language-matlab">&gt;    g = @(t,y1,<span class="keyword">...</span><span class="comment">,yn) f(t,[y1;...;yn]);   % function with scalar arguments</span>
+&gt;    j = ajac(g,[0 1...1]);                 <span class="comment">% Jacobian, 1st argument is parameter</span>
+&gt;    J = @(t,y) j(t,y(1),<span class="keyword">...</span><span class="comment">,y(n));         % Jacobian with vector argument</span>
+</pre><p>According constructions apply for constrained and unconstrained optimization.</p><p><i>See also:</i> <a href="matlab:doc('acurl')">acurl</a>, <a href="matlab:doc('adiff')">adiff</a>, <a href="matlab:doc('adiv')">adiv</a>, <a href="matlab:doc('agrad')">agrad</a>, <a href="matlab:doc('ahess')">ahess</a>, <a href="matlab:doc('ajac')">ajac</a>, <a href="matlab:doc('alap')">alap</a>, <a href="matlab:doc('ode15s')">ode15s</a>, <a href="matlab:doc('fmincon')">fmincon</a></p><h2>Rule of l'Hospital<a name="13"></a></h2><p>Singularities of type <tt>"0/0"</tt> are resolved automatically using the rule of l'Hospital as long as the order of the singularity does not exceed the order of the <i>audi</i> variable. Information on higher order derivatives can get lost and is then replaced by <tt>NaN</tt>.</p><p><i>Example:</i> <a href="example5.html">Sinc function and rule of l'Hospital</a></p><p>See also: <a href="matlab:doc('ataylor')">ataylor</a></p><h2>Matrix computations<a name="14"></a></h2><p>The <i>audi</i> class provides some basic functionality for matrix computations. All binary operators are implemented as well as the commands <tt>det,trace,sum,diff,inv,</tt> and <tt>norm</tt>. However, not all commands support all features of the built-in commands. For instance, it is not possible to solve underdetermined systems by the backslash operator.</p><p><i>Example:</i> <a href="example6.html">Gaussian and mean curvature of a Klein bottle</a></p><h2>Curves and Surfaces<a name="15"></a></h2><p>Differential geometric properties of parametrized curves and surfaces can be computed conveniently using the programs <tt>acurve</tt> and <tt>asurf</tt>, respectively.</p><p>Curvature as well as tangent and normal vector of a planar curve <tt>C</tt> are given by</p><pre class="language-matlab">&gt;   [kap,T,N] = acurve(C)
+</pre><p>If <tt>C</tt> is a space curve, also torsion and the binormal vector are provided,</p><pre class="language-matlab">&gt;   [kap,tau,T,N,B] = acurve(C)
+</pre><p>For a surface <tt>S</tt>, the Gaussian and mean curvature, the normal vector, and the first two fundamental forms are computed by</p><pre class="language-matlab">&gt;   [K,H,N,G,B] = asurf(S)
+</pre><p><i>Example:</i> <a href="example7.html">Curvature revisited</a></p><p>See also: <a href="matlab:doc('acurve')">acurve</a>, <a href="matlab:doc('asurf')">asurf</a></p><h2>Overloaded operators and functions<a name="16"></a></h2><p>The <i>audi</i> class overloads</p><div><ul><li>all unary and binary arithmetic operators</li><li>all relational and logical operators (except for <tt>&amp;&amp;</tt> and |  |)</li><li>the elementary functions <tt>exp,sin,cos,tan,sinh,cosh,tanh</tt> and their inverses</li><li>the functions <tt>det,trace,inv,norm,sum,diff,sqrt,abs,min,max,cross,</tt>   <tt>dot,real,imag,conj,angle,sign,isreal,isfinite,polyval</tt></li></ul></div><p>To overload any other function <tt>fct</tt> defined for doubles, insert the lines</p><pre class="language-matlab">&gt;    <span class="keyword">function</span> y = fct(x)
+&gt;      df = @(x) <span class="keyword">...</span><span class="comment">;</span>
+&gt;      y  = adval(df,x);
+&gt;    <span class="keyword">end</span>
+</pre><p>in the <tt>methods</tt> section of the class definition <tt>audi.m</tt>. The anonymous function <tt>df</tt> must return the derivative of <tt>fct</tt> at <tt>x</tt>.</p><p>If <tt>fct</tt> depends on additional parameters, say <tt>fct(a,b,x,c)</tt>, then use the syntax</p><pre class="language-matlab">&gt;    <span class="keyword">function</span> y = fct(a,b,x,c)
+&gt;      df = @(a,b,x,c) <span class="keyword">...</span><span class="comment">;</span>
+&gt;      y  = adval(df,a,b,x,c,3);
+&gt;    <span class="keyword">end</span>
+</pre><p>to indicate that <tt>df</tt> is the partial derivative of <tt>fct</tt> with respect to the third argument.</p><p><i>Example:</i> See the methods <tt>sin</tt> and <tt>polyval</tt> in the class definition <tt>audi.m</tt>.</p><h2>Limitations<a name="17"></a></h2><div><ul><li>The set of overloaded methods is not complete, but should   cover a substantial class of applications. Additional functions are readily   overloaded when needed.</li><li>The implementation aims at generality and ease of use at the cost of a   certain slow-down, in particular when requesting high order derivatives   for functions with many unknowns.</li><li>Currently, there is no mechanism to overload built-in functions depending   on several variables, like <tt>ellipj</tt>. In such cases, one argument can be   selected as variable, while all others are treated as parameters.</li><li>Function input is rarely checked for validity. So error messages   may be confusing when evoked by subordinate functions.</li></ul></div><h2>Release notes<a name="18"></a></h2><div><ul><li>AutoDiff 1.0, 05/01/16:      launch</li><li>AutoDiff 2.0, 05/09/16:      curly braces for arrays;      stand-alone functions;      <tt>aode</tt> fixed;      min/max yield derivatives from the right;      new overloaded functions <tt>atan2</tt>, <tt>real</tt>, <tt>imag</tt>, <tt>conj</tt>, <tt>angle</tt>, <tt>isfinite</tt>,      <tt>isreal</tt></li></ul></div><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Automatic Differentiation with the *AutoDiff* toolbox
+% 
+% by 
+% <http://www3.mathematik.tu-darmstadt.de/hp/geometrie-und-approximation/reif-ulrich/home.html 
+% Ulrich Reif>
+%
+% Version 2.0 - May 09, 2016
+%
+% The *AutoDiff toolbox* realizes automatic differentiation of functions
+% by means of operator overloading. Without relying on the symbolic toolbox,
+% it provides 
+%
+% * Ordinary and partial derivatives of arbitrary order
+% * Differential operators, like Laplacian and curl
+% * Creation of stand-alone functions, as requested for optimization or ODE tools
+% * Taylor expansions of explicit expressions and solutions of ODEs
+% * Curvature computation for curves and surfaces
+% * Resolution of singularities of type "0/0" by l'Hospital's rule
+%
+% Automatic differentiation is useful whenever derivatives of
+% functional expressions are needed and calculus by hand is too tedious. 
+% Finite differences and symbolic computations are alternatives with
+% pros and cons known to anybody working with them.
+%
+% The _audi_ class, which is the central part of the toolbox, admits to 
+% evaluate derivatives of functions which
+% are defined in the usual way by composing arithmetic operators and
+% elementary functions. During evaluation, derivatives are computed in 
+% the background without further user interaction if the input variables 
+% are of class _audi_. In principle, automatic differentiation yields 
+% exact results, but of course, accuracy is subject to rounding errors, 
+% as for any other numerical computation.
+%
+% This is the second version of *AutoDiff*, which is certainly still not perfect.  
+% Error reports and suggestions are welcome.
+
+%% Initialization and evaluation
+% When initializing arguments of functions as _audi_ variables, subsequent
+% results of computations do not only contain functions values, as usual,
+% but also derivatives up to some given order |k|. 
+%
+% *Univariate case:* 
+% Let |f| be a function depending on one variable.
+% To evaluate |f| and all its derivatives up to order |k|
+% at some points |v|, stored as a _double_ array, type
+%
+%   >    x = ainit(v,k)
+%   >    y = f(x)
+%
+% Curly braces are used to get the values |yd| of the |d|-th derivative
+% of |f| at the points |v|:
+%
+%   >    yd = y{d}
+%
+% The size of the double array |yd| is
+%
+%   >    asize(y) = size(yd) = size(v)
+
+%%
+
+% Example
+x = ainit(1:5,3);      % initialize audi variable, up to 3rd derivative covered
+y = x.^3;              % compute function f(x) = x^3
+y{2}                   % values of 2nd derivative, f''(x) = 6x
+
+%%
+% *Multivariate case:* If |f| depends on |n| variables and shall be evaluated
+% at the some points |v1,...,vn|, stored as _double_ arrays of equal size, type
+%
+%  >    [x1,...,xn] = ainit(v1,...,vn,k)
+%  >    y = f(x1,...,xn)
+%
+% Again, curly braces are used to get the values |yd| of the partial derivative of order
+% |d1,...,dn| at the points |v1,...,vn|:
+%
+%   >    yd = y{d1,...,dn}
+%
+% The sum |d1+...+dn| must not exceed
+%
+%   >    aord(y) = k
+%
+% Curly braces can be replaced by the command |aeval|,
+%
+%   >    y{d1,...,dn} = aeval(y,d1,...,dn)
+%
+% _Example:_ 
+% <example1.html Functions, derivatives, and Newton's method> 
+%
+% _See also:_ 
+% <matlab:doc('ainit') ainit>,
+% <matlab:doc('aeval') aeval>,
+% <matlab:doc('asize') asize>,
+% <matlab:doc('aord') aord>
+
+%% Arrays
+% _audi_ variables can be concatenated to form arrays in the familiar way.
+% Also operations like |repmat| or |transpose| are supported. _audi_ arrays
+% can be multiplied by other arrays of class _double_ or _audi_ in the sense
+% of matrix and elementwise multiplication using the operators |*| and |.*|,
+% respectively.
+%
+% Parentheses select subarrays of _audi_ arrays. By contrast, to define the 
+% _audi_ array |b| which contains only parts of the data of the given 
+% _audi_ array |a|, use
+%
+%   >    b = aget(a,ref)  
+%
+% where |ref| is a single index or a list of indices addressing parts 
+% of the data arrays. Note that |size(b)=size(a)| while |asize(b)<=asize(a)|.
+% Parts of _audi_ data are replaced by
+%
+%   >    a = aset(a,b,ref) 
+%
+% Evaluation of arrays by curly braces follows special formatting rules, as
+% documented for |aeval|.
+%
+% _Example:_ 
+% <example2.html Curvature and torsion of a space curve> 
+%
+% _See also:_ 
+% <matlab:doc('aeval') aeval>,
+% <matlab:doc('aget') aget>,
+% <matlab:doc('aset') aset>
+
+%% Taylor expansion of explicit functions and ODEs
+% *Explicit case:* Let |f| be a scalar function of one variable. To determine
+% the coefficients |p| of the Taylor polynomial of degree |k| at the point |x0|, 
+% type
+%
+%   >    x = ainit(x0,k)
+%   >    p = ataylor(f(x))
+
+%%
+
+% Example
+x = ainit(1,4);
+p = ataylor(log(x))
+
+%%
+% *Solution of ODE:* Consider the initial value problem
+%
+%   >    y'(x) = f(x,y)
+%   >    y(x0) = y0
+%
+% To obtain the coefficients |p| of the degree |k| Taylor polynomial of the sought
+% function |y| at |x0|, type
+%
+%   >    p = aode(f,x0,y0,k)
+%
+% where |f = @(x,y)...| is an anonymous function. For systems of ODEs,
+% the Taylor polynomials |p1,...,pm| of the sought functions |y1,...,ym|
+% can be computed by
+%
+%   >    [p1,...,pm] = aode(f,x0,y0,k)
+%
+% where |f = @(x,y1,...,ym)[...;...;...]| is an anonymous function returning
+% a column vector with |m| entries.
+%
+% It is possible to pass additional parameters to the routine,
+%
+%   >    [p1,...,pm] = aode(f,x0,y0,k,c1,c2,...)
+%
+% _Example:_ 
+% <example3.html The mathematical pendulum> 
+%
+% _See also:_ 
+% <matlab:doc('ataylor') ataylor>,
+% <matlab:doc('aode') aode>
+
+%% Differential operators
+%
+% Differential operators map _audi_ variables to new _audi_ variables of lower order.
+% 
+% The general differentiation operator is
+%
+%   >    yd = adiff(y,d1,...,dn)
+%
+% The order of the _audi_ variable |yd| is
+%
+%   >    aord(yd) = aord(y) - (d1+...+dn)
+%
+% The _audi_ class also provides various other predefined differential operators:
+%
+% * scalar-valued: |alap| (Laplacian), |adiv| (divergence)
+% * vector-valued: |agrad| (gradient), |acurl| (curl)
+% * matrix-valued: |ajac| (Jacobian), |ahess| (Hessian)
+% 
+% There exists a shortcut to evaluate the outcome of any of these operators:
+%
+%  >    a*(y,0) = aeval(a*(y),0,...,0)
+% 
+% 
+% _Example:_ 
+% <example4.html  Laplacian of the peaks function and its maximum> 
+%
+% _See also:_ 
+% <matlab:doc('acurl') acurl>,
+% <matlab:doc('adiff') adiff>,
+% <matlab:doc('adiv') adiv>,
+% <matlab:doc('agrad') agrad>,
+% <matlab:doc('ahess') ahess>,
+% <matlab:doc('ajac') ajac>,
+% <matlab:doc('alap') alap>
+
+%% Stand-alone functions
+%
+% Sometimes, it is convenient or even necessary to have available a stand-alone 
+% function for evaluating gradients or other differential properties of a given 
+% function. In particular, if you want to 
+%
+% * pass derivatives to routines like |integral| or |fzero|
+% * enhance the performance of optimization routines like |fmincon| by supplying
+%   gradients or Hessians
+% * furnish solvers for stiff ODEs like |ode15s| by supplying Jacobians 
+%
+% such functionality is requested. To this end, all differential operators described 
+% in the preceding section are able to create function handles from function handles. 
+% Using this feature, initialization of _audi_ variables becomes obsolete at the
+% cost of slightly increased computation times.
+
+%%
+
+% Example
+f_uvv = adiff(@peaks,[1 2]);    % 2nd argument = order of differentiation
+f_uvv(-2:2,zeros(1,5))          % evaluate partial derivative
+
+L = alap(@peaks,2);             % 2nd argument = number of variables
+L(-2:2,zeros(1,5))              % evaluate Laplacian
+
+%%
+% It is important to note that the arguments to the functions |f_uvv| and |L|
+% are standard double arrays, and not _audi_ variables.
+
+%%
+% When solving a stiff ODE |y' = f(t,y),| the Jacobian |J| of |f| with respect to
+% |y| may be supplied to solvers like |ode15s| to enhance performance. The
+% according function handle can be created as follows:
+%
+%   >    g = @(t,y1,...,yn) f(t,[y1;...;yn]);   % function with scalar arguments
+%   >    j = ajac(g,[0 1...1]);                 % Jacobian, 1st argument is parameter
+%   >    J = @(t,y) j(t,y(1),...,y(n));         % Jacobian with vector argument
+%
+% According constructions apply for constrained and unconstrained optimization.
+%
+% _See also:_ 
+% <matlab:doc('acurl') acurl>,
+% <matlab:doc('adiff') adiff>,
+% <matlab:doc('adiv') adiv>,
+% <matlab:doc('agrad') agrad>,
+% <matlab:doc('ahess') ahess>,
+% <matlab:doc('ajac') ajac>,
+% <matlab:doc('alap') alap>,
+% <matlab:doc('ode15s') ode15s>,
+% <matlab:doc('fmincon') fmincon>
+
+
+%% Rule of l'Hospital
+%
+% Singularities of type |"0/0"| are resolved automatically using the 
+% rule of l'Hospital as long as the order of the singularity does not 
+% exceed the order of the _audi_ variable. Information on higher order 
+% derivatives can get lost and is then replaced by |NaN|.
+%
+% _Example:_ 
+% <example5.html Sinc function and rule of l'Hospital> 
+%
+% See also: 
+% <matlab:doc('ataylor') ataylor>
+
+%% Matrix computations
+%
+% The _audi_ class provides some basic functionality for matrix computations.
+% All binary operators are implemented as well as the commands 
+% |det,trace,sum,diff,inv,| and |norm|. However, not all commands support all
+% features of the built-in commands. For instance, it is not possible to
+% solve underdetermined systems by the backslash operator.  
+%
+% _Example:_ 
+% <example6.html Gaussian and mean curvature of a Klein bottle> 
+
+%% Curves and Surfaces
+%
+% Differential geometric properties of parametrized curves and surfaces can 
+% be computed conveniently using the programs |acurve| and |asurf|, respectively.
+%
+% Curvature as well as tangent and normal vector of a planar curve |C| are given by
+%
+%   >   [kap,T,N] = acurve(C)
+%
+% If |C| is a space curve, also torsion and the binormal vector are provided,
+%
+%   >   [kap,tau,T,N,B] = acurve(C)
+%
+% For a surface |S|, the Gaussian and mean curvature, the normal vector, and the
+% first two fundamental forms are computed by
+%
+%   >   [K,H,N,G,B] = asurf(S)
+%
+% _Example:_ 
+% <example7.html Curvature revisited> 
+%
+% See also: 
+% <matlab:doc('acurve') acurve>,
+% <matlab:doc('asurf') asurf>
+
+%% Overloaded operators and functions
+% The _audi_ class overloads
+%
+% * all unary and binary arithmetic operators
+% * all relational and logical operators (except for |&&| and | || |)
+% * the elementary functions |exp,sin,cos,tan,sinh,cosh,tanh| and their inverses
+% * the functions |det,trace,inv,norm,sum,diff,sqrt,abs,min,max,cross,| 
+%   |dot,real,imag,conj,angle,sign,isreal,isfinite,polyval|
+%
+% To overload any other function |fct| defined for doubles, insert the lines
+%
+%   >    function y = fct(x)
+%   >      df = @(x) ...;
+%   >      y  = adval(df,x);
+%   >    end
+%
+% in the |methods| section of the class definition |audi.m|. The anonymous 
+% function |df| must return the derivative of |fct| at |x|. 
+%
+% If |fct| depends on additional parameters, say |fct(a,b,x,c)|, then use the syntax
+%
+%   >    function y = fct(a,b,x,c)
+%   >      df = @(a,b,x,c) ...;
+%   >      y  = adval(df,a,b,x,c,3);
+%   >    end
+%
+% to indicate that |df| is the partial derivative of |fct| with respect
+% to the third argument.
+%
+% _Example:_ 
+% See the methods |sin| and |polyval| in the class definition |audi.m|.
+
+
+%% Limitations
+%
+% * The set of overloaded methods is not complete, but should
+%   cover a substantial class of applications. Additional functions are readily 
+%   overloaded when needed.
+% * The implementation aims at generality and ease of use at the cost of a
+%   certain slow-down, in particular when requesting high order derivatives
+%   for functions with many unknowns.
+% * Currently, there is no mechanism to overload built-in functions depending
+%   on several variables, like |ellipj|. In such cases, one argument can be
+%   selected as variable, while all others are treated as parameters.
+% * Function input is rarely checked for validity. So error messages
+%   may be confusing when evoked by subordinate functions.
+
+%% Release notes
+%
+% * AutoDiff 1.0, 05/01/16: 
+%      launch
+% * AutoDiff 2.0, 05/09/16: 
+%      curly braces for arrays;
+%      stand-alone functions;
+%      |aode| fixed; 
+%      min/max yield derivatives from the right;
+%      new overloaded functions |atan2|, |real|, |imag|, |conj|, |angle|, |isfinite|, 
+%      |isreal|
+##### SOURCE END #####
+--></body></html>

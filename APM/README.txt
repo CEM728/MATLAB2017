@@ -1,0 +1,3 @@
+An implementation of the argument principle method and a derivative-free method for complex root search on a meromorphic domain. The contour selection process is specialized for the step-index fiber dispersion relation. It can be used in two modes, with either propagation constant or cylinder permittivity as the search variable: disprootsbeta and disprootsepi.
+
+Input are number of roots desired, and cylinder parameters. The latter is given as an object, to simply the passing of cylinder parameters between many functions. This object is defined in CylinderGeometry. Examples of how to use disproots by defining cylinder parameters to produce dispersion relations are given in plotdispbeta and plotdispepi. These codes reproduce Figure 3 and 4 of the paper.
